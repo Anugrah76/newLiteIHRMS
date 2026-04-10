@@ -61,12 +61,16 @@ export default function SubmitScreen() {
                     toast.show('success', 'Company Code Valid');
                     setTimeout(() => router.push('/(auth)/login'), 2500);
                 } else {
-                    toast.show('error', 'Invalid Code', data.message);
+                    toast.show('error', data.message || 'Invalid Code');
                 }
             },
-            onError: (error) => {
+            onError: (error: any) => {
                 console.error('Error during code validation:', error);
-                toast.show('error', 'Network Error', 'Please try again');
+                // Extract API message from error response if available
+                const apiMessage = error?.response?.data?.message
+                    || error?.message
+                    || 'Please try again';
+                toast.show('error', 'Verification Failed', apiMessage);
             },
         });
     };
@@ -83,8 +87,7 @@ export default function SubmitScreen() {
                         <View style={[styles.logoCircle, { backgroundColor: 'rgba(255, 255, 255, 0.54)' }]}>
                             <Image source={logo} style={styles.logo} />
                         </View>
-                        <Text style={styles.appName}>IHRMS</Text>
-                        <Text style={styles.appTagline}>Indovision</Text>
+
                     </View>
                 }
 
@@ -138,7 +141,7 @@ export default function SubmitScreen() {
                         </Pressable>
 
                         <Text style={[styles.note, { color: theme.colors.textTertiary }]}>
-                            Contact your system administrator if you don't have a code
+                            Contact your HR if you don't have a code
                         </Text>
                     </View>
                 </View>

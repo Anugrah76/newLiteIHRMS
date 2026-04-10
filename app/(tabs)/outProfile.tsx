@@ -84,7 +84,7 @@ export default function ProfileScreen() {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={[styles.menuItem, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border, marginTop: 12 }]}
                             onPress={() => router.push('/gamification-wellness')}
                             activeOpacity={0.7}
@@ -93,7 +93,7 @@ export default function ProfileScreen() {
                                 <Trophy width={20} height={20} color={theme.colors.primary} />
                                 <Text style={[styles.menuItemText, { color: theme.colors.text }]}>Wellness & Achievements</Text>
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                         {/*  <TouchableOpacity
                         style={[styles.menuItem, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border, marginTop: 12 }]}

@@ -35,8 +35,10 @@ export const useCompanyConfig = () => {
     return useMutation({
         mutationFn: getCompanyConfig,
         onSuccess: (data) => {
-            // Store base URL and company config in Zustand
-            setConfig(data);
+            // Only store config when response is valid (status 200)
+            if (data.status === 200 && data.data) {
+                setConfig(data);
+            }
         },
     });
 };

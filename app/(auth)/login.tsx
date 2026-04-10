@@ -137,7 +137,7 @@ export default function LoginScreen() {
                     <View style={[styles.cardHeader, { borderBottomColor: theme.colors.border }]}>
                         <Text style={[styles.title, { color: theme.colors.text }]}>Employee Login</Text>
                         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                            Enter your same credentials that you use to access the IHRMS website
+                            Enter your same credentials that you use to access the iHRMS portal
                         </Text>
                     </View>
 
