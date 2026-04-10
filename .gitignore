@@ -46,3 +46,4 @@ build-*.aab
 
 build-*.apk
 build-*.aab
+*.zip
