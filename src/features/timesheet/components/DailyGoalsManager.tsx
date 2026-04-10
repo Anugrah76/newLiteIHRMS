@@ -96,7 +96,7 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
         }
     };
 
-    const handleToggleComplete = async (goalId: string) => {
+       const handleToggleComplete = async (goalId: string) => {
         if (isSubmitted) return;
 
         const goal = goals.find(g => g.id === goalId);
@@ -248,7 +248,7 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
 
     const gradientColors = getTimeBasedGradient();
     // Use dark text for light backgrounds
-    const textColor = theme.isDark ? '#FFFFFF' : '#2D3748';
+    const textColor = '#2D3748';
 
     return (
         <>
@@ -626,13 +626,13 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#00000000',
         fontWeight: '600',
         marginBottom: 4,
     },
     emptySubtext: {
         fontSize: 14,
-        color: 'rgba(255, 255, 255, 0.7)',
+        color: 'rgba(0, 0, 0, 0)',
     },
     inputSection: {
         flexDirection: 'row',
@@ -668,7 +668,7 @@ const styles = StyleSheet.create({
     submittedText: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: '#00000000',
         textAlign: 'center',
     },
     // Modal styles

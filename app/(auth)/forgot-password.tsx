@@ -1,21 +1,29 @@
 import { useRouter } from 'expo-router';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ActivityIndicator,
     Pressable,
+    Image,
     StyleSheet,
     Text,
     TextInput,
-    View,
+    View, 
     StatusBar,
     KeyboardAvoidingView,
     Platform,
+    Keyboard,
+    BackHandler
 } from 'react-native';
 import { AnimatedGradientBackground } from '@shared/components/AnimatedGradientBackground';
 import { useToast } from '@shared/components/Toast';
 import { useForgotPassword } from '@features/auth/api/authApi';
 import { useTheme } from '@shared/theme';
+import { useConfigStore } from '@shared/store';
+
+
+
+const defaultLogo = require('../../assets/images/ihrms-logo.png');
 
 /**
  * Forgot Password Screen - Professional Corporate Design
@@ -24,9 +32,12 @@ import { useTheme } from '@shared/theme';
 export default function ForgotPasswordScreen() {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+        const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    
     const router = useRouter();
     const theme = useTheme();
     const toast = useToast();
+    const companyConfig = useConfigStore((state) => state.companyConfig);
 
     const { mutate: requestReset, isPending } = useForgotPassword();
 
@@ -34,6 +45,26 @@ export default function ForgotPasswordScreen() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
+
+
+        useEffect(() => {
+            const backAction = () => {
+                router.back();
+                return true;
+            };
+    
+            const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+                setKeyboardVisible(true));
+            const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+                setKeyboardVisible(false));
+    
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+            return () => {
+                keyboardDidHideListener.remove();
+                keyboardDidShowListener.remove();
+                backHandler.remove();
+            }
+        }, [router]);
 
     const handleSubmit = () => {
         if (!email.trim()) {
@@ -70,6 +101,7 @@ export default function ForgotPasswordScreen() {
     if (submitted) {
         return (
             <AnimatedGradientBackground>
+                
                 <StatusBar barStyle={theme.isDark ? 'light-content' : 'light-content'} />
 
                 <View style={styles.container}>
@@ -118,17 +150,34 @@ export default function ForgotPasswordScreen() {
                 </View>
             </Pressable>
 
+
+                      
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
+
+                      {!isKeyboardVisible &&
+                    <View style={styles.logoContainer}>
+                        <View style={[styles.logoCircle, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
+                            <Image
+                                source={companyConfig?.logo_url ? { uri: companyConfig.logo_url } : defaultLogo}
+                                style={styles.logo}
+                            />
+                        </View>
+                        {/*   <Text style={styles.companyName}>
+                            {companyConfig?.company_name || ''}
+                        </Text> */}
+                    </View>
+                }
+
                 {/* Card */}
                 <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary }]}>
                     <View style={[styles.cardHeader, { borderBottomColor: theme.colors.border }]}>
                         <Text style={[styles.title, { color: theme.colors.text }]}>Forgot Password?</Text>
-                        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+                       {/*  <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
                             Enter your email address and we'll send you instructions to reset your password
-                        </Text>
+                        </Text> */}
                     </View>
 
                     <View style={styles.cardBody}>
@@ -146,7 +195,7 @@ export default function ForgotPasswordScreen() {
                             </View>
                             <TextInput
                                 style={[styles.input, { color: theme.colors.text }]}
-                                placeholder="Enter your email"
+                                placeholder="Enter your registered email"
                                 placeholderTextColor={theme.colors.textTertiary}
                                 value={email}
                                 onChangeText={setEmail}
@@ -227,6 +276,28 @@ const styles = StyleSheet.create({
         padding: 24,
         borderBottomWidth: 1,
     },
+    logoContainer: {
+        alignItems: 'center',
+        margin: 20,
+    },
+    logo: {
+        width: 100,
+        height: 100,
+        resizeMode: 'contain',
+    },
+    logoCircle: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 6,
+    },
     title: {
         fontSize: 20,
         fontWeight: '600',
@@ -256,6 +327,7 @@ const styles = StyleSheet.create({
     iconBox: {
         width: 48,
         height: 48,
+        borderRadius:6,
         borderRightWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -263,7 +335,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         height: 48,
-        fontSize: 16,
+        fontSize: 14,
         paddingHorizontal: 16,
         fontWeight: '500',
     },

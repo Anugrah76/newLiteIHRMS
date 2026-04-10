@@ -140,13 +140,13 @@ export default function LoginScreen() {
                     <View style={[styles.cardHeader, { borderBottomColor: theme.colors.border }]}>
                         <Text style={[styles.title, { color: theme.colors.text }]}>Employee Login</Text>
                         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                            Enter your same credentials that you use to access the iHRMS portal
+                            Please use your iHRMS login credentials here
                         </Text>
                     </View>
 
                     <View style={styles.cardBody}>
                         {/* Username */}
-                        <Text style={[styles.label, { color: theme.colors.text }]}>Username / Employee ID</Text>
+                        <Text style={[styles.label, { color: theme.colors.text }]}>Username</Text>
                         <View style={[styles.inputContainer, {
                             backgroundColor: theme.colors.surfaceVariant,
                             borderColor: theme.colors.border,
@@ -259,9 +259,9 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     logoCircle: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     logo: {
-        width: 70,
-        height: 70,
+        width: 100,
+        height: 100,
         resizeMode: 'contain',
     },
     companyName: {

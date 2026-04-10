@@ -5,13 +5,19 @@ import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { useToast } from '@shared/components/Toast';
 import { useForgotPassword } from '@features/auth/api/authApi';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react-native';
+import { useConfigStore } from '@shared/store';
+const defaultLogo = require('../assets/images/ihrms-logo.png');
 
+ 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
     const toast = useToast();
-
+    const companyConfig = useConfigStore((state) => state.companyConfig);
+    
     const [email, setEmail] = useState('');
     const [success, setSuccess] = useState(false);
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    
 
     const { mutate: forgotPassword, isPending: loading } = useForgotPassword();
 
@@ -44,6 +50,21 @@ export default function ForgotPasswordScreen() {
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
+
+                                {/* Company Logo */}
+                {!isKeyboardVisible &&
+                    <View style={styles.logoContainer}>
+                        <View style={[styles.logoCircle, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
+                            <Image
+                                source={companyConfig?.logo_url ? { uri: companyConfig.logo_url } : defaultLogo}
+                                style={styles.logo}
+                            />
+                        </View>
+                        {/*   <Text style={styles.companyName}>
+                            {companyConfig?.company_name || ''}
+                        </Text> */}
+                    </View>
+                }
                 <View style={styles.content}>
                     {/* Logo */}
                     <View style={styles.logoContainer}>
@@ -56,6 +77,8 @@ export default function ForgotPasswordScreen() {
 
                     {/* Card */}
                     <View style={styles.card}>
+
+                        
                         <View style={styles.iconContainer}>
                             <Mail size={48} color="#6366F1" />
                         </View>
@@ -141,6 +164,19 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         marginBottom: 40,
+    },
+    logoCircle: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 6,
     },
     logo: {
         width: 100,

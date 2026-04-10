@@ -141,7 +141,7 @@ export default function SubmitScreen() {
                         </Pressable>
 
                         <Text style={[styles.note, { color: theme.colors.textTertiary }]}>
-                            Contact your HR if you don't have a code
+                            Contact your HR if you don't have a company code
                         </Text>
                     </View>
                 </View>
@@ -163,16 +163,16 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     logoCircle: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
     },
     logo: {
-        width: 60,
-        height: 60,
+        width: 100,
+        height: 100,
         resizeMode: 'contain',
     },
     appName: {
