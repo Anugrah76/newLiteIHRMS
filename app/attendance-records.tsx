@@ -215,19 +215,60 @@ export default function AttendanceRecordsScreen() {
 
     const { data: response, isLoading } = useAttendanceRecords(getMonthStartEnd(currentDate));
     const result = response?.result;
+    const isFreezed = response?.freezed === '1';
 
-    // --- Prepare Data (The Robust Way) ---
-    const presentDays = extractDates(result?.present_days || [], 'present');
-    const leaveDays = extractDates(result?.leave_days || [], 'leave');
-    const compOffDays = extractDates(result?.comp_off_days || [], 'compoff');
-    const holidayDays = extractDates(result?.holiday_days || [], 'holiday');
-    const mispunchDays = extractDates(result?.mispunch_days || [], 'mispunch');
-    const weekOffDays = extractDates(result?.weekoff || [], 'weekoff');
-    // Absent logic: Past days not in any other category
-    // For simplicity, we can trust API or calculate roughly. The reference calculates it.
-    // Let's rely on API `absent_days` if available, or just leave empty for now as user stressed week offs.
-    // Actually, looking at reference, it calculates it. I'll skip complex calc for now to avoid errors, unless API sends it.
-    const absentDays = extractDates(result?.absent_days || [], 'absent');
+    // --- Prepare Data ---
+    // When freezed=1, present_days is a flat string array: ["Week Off", "A", "P", "Holiday", ...]
+    // Each index maps to day of month (index 0 = day 1). We parse statuses into date arrays.
+    // When freezed=0, result has structured objects with dates.
+
+    let presentDays: string[] = [];
+    let leaveDays: string[] = [];
+    let compOffDays: string[] = [];
+    let holidayDays: string[] = [];
+    let mispunchDays: string[] = [];
+    let weekOffDays: string[] = [];
+    let absentDays: string[] = [];
+
+    if (isFreezed && result?.present_days && Array.isArray(result.present_days)) {
+        // Freezed mode: flat status array
+        const statusArray: string[] = result.present_days;
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = formatDate(new Date(year, month, day));
+            const status = (statusArray[day - 1] || '').trim();
+
+            if (!status) continue;
+
+            if (status === 'M') {
+                mispunchDays.push(dateStr);
+            } else if (status === 'P' || status === 'Warning' || status === 'Q1' || status === 'Q2' || status === 'Q3' || status === 'Q4') {
+                presentDays.push(dateStr);
+            } else if (status.includes('LWP') || status === 'SL' || status === 'EL' || status === 'CL' || status === 'OD') {
+                leaveDays.push(dateStr);
+            } else if (status === 'Holiday') {
+                holidayDays.push(dateStr);
+            } else if (status === 'CO') {
+                compOffDays.push(dateStr);
+            } else if (status === 'A') {
+                absentDays.push(dateStr);
+            } else if (status === 'Week Off') {
+                weekOffDays.push(dateStr);
+            }
+        }
+    } else {
+        // Non-freezed mode: structured date objects
+        presentDays = extractDates(result?.present_days || [], 'present');
+        leaveDays = extractDates(result?.leave_days || [], 'leave');
+        compOffDays = extractDates(result?.comp_off_days || [], 'compoff');
+        holidayDays = extractDates(result?.holiday_days || [], 'holiday');
+        mispunchDays = extractDates(result?.mispunch_days || [], 'mispunch');
+        weekOffDays = extractDates(result?.weekoff || [], 'weekoff');
+        absentDays = extractDates(result?.absent_days || [], 'absent');
+    }
 
     const dateStatusMap = new Map<string, string>();
     presentDays.forEach(d => dateStatusMap.set(d, 'present'));

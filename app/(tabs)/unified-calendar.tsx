@@ -159,15 +159,56 @@ export default function UnifiedCalendarScreen() {
         }, [currentMonth])
     );
 
-    // Extract Attendance Data
+    // Extract Attendance Data (freezed-aware)
     const attendanceResult = attendanceResponse?.result;
-    const presentDays = extractDates(attendanceResult?.present_days || [], 'present');
-    const leaveDays = extractDates(attendanceResult?.leave_days || [], 'leave');
-    const compOffDays = extractDates(attendanceResult?.comp_off_days || [], 'compoff');
-    const holidayDays = extractDates(attendanceResult?.holiday_days || [], 'holiday');
-    const mispunchDays = extractDates(attendanceResult?.mispunch_days || [], 'mispunch');
-    const weekOffDays = extractDates(attendanceResult?.weekoff || [], 'weekoff');
-    // const absentDays = extractDates(attendanceResult?.absent_days || [], 'absent');
+    const isFreezed = attendanceResponse?.freezed === '1';
+
+    let presentDays: string[] = [];
+    let leaveDays: string[] = [];
+    let compOffDays: string[] = [];
+    let holidayDays: string[] = [];
+    let mispunchDays: string[] = [];
+    let weekOffDays: string[] = [];
+    let absentDays: string[] = [];
+
+    if (isFreezed && attendanceResult?.present_days && Array.isArray(attendanceResult.present_days)) {
+        // Freezed mode: present_days is a flat status array like ["Week Off", "A", "P", ...]
+        const statusArray: string[] = attendanceResult.present_days as string[];
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = formatDate(new Date(year, month, day));
+            const status = (statusArray[day - 1] || '').trim();
+
+            if (!status) continue;
+
+            if (status === 'M') {
+                mispunchDays.push(dateStr);
+            } else if (status === 'P' || status === 'Warning' || status === 'Q1' || status === 'Q2' || status === 'Q3' || status === 'Q4') {
+                presentDays.push(dateStr);
+            } else if (status.includes('LWP') || status === 'SL' || status === 'EL' || status === 'CL' || status === 'OD') {
+                leaveDays.push(dateStr);
+            } else if (status === 'Holiday') {
+                holidayDays.push(dateStr);
+            } else if (status === 'CO') {
+                compOffDays.push(dateStr);
+            } else if (status === 'A') {
+                absentDays.push(dateStr);
+            } else if (status === 'Week Off') {
+                weekOffDays.push(dateStr);
+            }
+        }
+    } else {
+        // Non-freezed mode: structured date objects
+        presentDays = extractDates(attendanceResult?.present_days || [], 'present');
+        leaveDays = extractDates(attendanceResult?.leave_days || [], 'leave');
+        compOffDays = extractDates(attendanceResult?.comp_off_days || [], 'compoff');
+        holidayDays = extractDates(attendanceResult?.holiday_days || [], 'holiday');
+        mispunchDays = extractDates(attendanceResult?.mispunch_days || [], 'mispunch');
+        weekOffDays = extractDates(attendanceResult?.weekoff || [], 'weekoff');
+    }
 
     const attendanceStatusMap = new Map<string, string>();
     presentDays.forEach(d => attendanceStatusMap.set(d, 'present'));
@@ -176,7 +217,7 @@ export default function UnifiedCalendarScreen() {
     holidayDays.forEach(d => attendanceStatusMap.set(d, 'holiday'));
     mispunchDays.forEach(d => attendanceStatusMap.set(d, 'mispunch'));
     weekOffDays.forEach(d => attendanceStatusMap.set(d, 'weekoff'));
-    //absentDays.forEach(d => attendanceStatusMap.set(d, 'absent'));
+    absentDays.forEach(d => attendanceStatusMap.set(d, 'absent'));
 
     // Extract Timesheet Data
     const timesheetSubmittedDates = timesheetStatus?.submittedDates || [];

@@ -15,7 +15,6 @@ import { TopBar } from '@shared/components/ui/TopBar';
 import { Sidebar } from '@shared/components/Sidebar';
 import { useTheme } from '@shared/theme';
 import { useToast } from '@shared/components/Toast';
-import { useMarkAttendance } from '@features/attendance/hooks';
 import { markAttendance as markAttendanceApi } from '@features/attendance/api/attendanceApi';
 import { useAuthStore, usePunchOptionStore } from '@shared/store';
 import { MapPin, Clock, User, Fingerprint, QrCode, AlertTriangle, RefreshCw } from 'lucide-react-native';
@@ -46,10 +45,9 @@ export default function MarkAttendanceScreen() {
 
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
-    const [geocodeData, setGeocodeData] = useState<Location.LocationGeocodedAddress | null>(null);
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
-    const [state, setState] = useState('');
+    const [locState, setLocState] = useState('');
     const [loadingLocation, setLoadingLocation] = useState(true);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [loading, setLoading] = useState(false);
@@ -110,10 +108,9 @@ export default function MarkAttendanceScreen() {
 
             if (geocode.length > 0) {
                 const place = geocode[0];
-                setGeocodeData(place);
                 setAddress(`${place.street || ''} ${place.district || ''}`);
                 setCity(place.city || place.district || '');
-                setState(place.region || '');
+                setLocState(place.region || '');
             }
         } catch (error) {
             console.error('Location error:', error);
@@ -132,7 +129,6 @@ export default function MarkAttendanceScreen() {
         try {
             const compatible = await LocalAuthentication.hasHardwareAsync();
             if (!compatible) {
-                // No biometric hardware — proceed without fingerprint
                 showRemarksModal(false);
                 return;
             }
@@ -210,7 +206,7 @@ export default function MarkAttendanceScreen() {
                 long: location.coords.longitude.toString(),
                 address: address || 'Unknown Area',
                 city: city || 'Unknown City',
-                state: state || '',
+                state: locState || '',
                 remarks,
             });
 
@@ -295,7 +291,6 @@ export default function MarkAttendanceScreen() {
 
         toast.show('success', 'Punch Successful!', `Address: ${address}, ${city}`);
 
-        // Handle geo tracking
         if (result.geo_tracking_status === '1') {
             console.log('Geo tracking enabled');
         }
@@ -308,7 +303,7 @@ export default function MarkAttendanceScreen() {
         setLoading(true);
         try {
             const response = await markAttendanceApi({
-                mode: '2', // mode 2 = save new location
+                mode: '2',
                 email: user?.username || user?.email || '',
                 lat: newLocationData.lat,
                 long: newLocationData.long,
@@ -441,7 +436,6 @@ export default function MarkAttendanceScreen() {
                     {!loadingLocation && location && (
                         <View style={styles.actionSection}>
                             {empOption === 1 ? (
-                                /* Normal punch */
                                 <TouchableOpacity
                                     style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
                                     onPress={handleMark}
@@ -458,9 +452,8 @@ export default function MarkAttendanceScreen() {
                                     )}
                                 </TouchableOpacity>
                             ) : empOption === 2 ? (
-                                /* Biometric punch */
                                 <TouchableOpacity
-                                    style={[styles.biometricButton]}
+                                    style={styles.biometricButton}
                                     onPress={handleBiometricAuthentication}
                                     disabled={loading}
                                     activeOpacity={0.8}
@@ -475,9 +468,8 @@ export default function MarkAttendanceScreen() {
                                     )}
                                 </TouchableOpacity>
                             ) : empOption === 3 ? (
-                                /* QR only */
                                 <TouchableOpacity
-                                    style={[styles.qrButton]}
+                                    style={styles.qrButton}
                                     onPress={() => router.push('/qr-scanner')}
                                     disabled={loading}
                                     activeOpacity={0.8}
@@ -492,7 +484,6 @@ export default function MarkAttendanceScreen() {
                                     )}
                                 </TouchableOpacity>
                             ) : empOption === 4 ? (
-                                /* Both biometric + QR */
                                 <View style={styles.multiButtonContainer}>
                                     <TouchableOpacity
                                         style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}
@@ -528,7 +519,6 @@ export default function MarkAttendanceScreen() {
                                     </TouchableOpacity>
                                 </View>
                             ) : (
-                                /* No punch option */
                                 <View style={styles.noPunchContainer}>
                                     <AlertTriangle width={24} height={24} color={theme.colors.textSecondary} />
                                     <Text style={[styles.noPunchText, { color: theme.colors.textSecondary }]}>
@@ -647,7 +637,7 @@ export default function MarkAttendanceScreen() {
                         <Text style={[styles.locationModalMessage, { color: theme.colors.textSecondary }]}>
                             We need access to your location to verify your attendance accurately.
                             {'\n\n'}
-                            The app cannot function without location permissions as it ensures you're marking attendance from the correct workplace.
+                            The app cannot function without location permissions as it ensures you are marking attendance from the correct workplace.
                             {'\n\n'}
                             Please enable location services in your device settings to continue.
                         </Text>

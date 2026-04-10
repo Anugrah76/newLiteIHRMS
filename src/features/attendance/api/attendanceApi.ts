@@ -157,12 +157,13 @@ export interface AttendanceRecord {
  * Attendance API Response Result
  */
 export interface AttendanceResult {
-    present_days: AttendanceRecord[];
+    present_days: AttendanceRecord[] | string[]; // string[] when freezed=1
     leave_days: AttendanceRecord[];
     weekoff: any[];
     holiday_days: any[];
     mispunch_days: string[];
     comp_off_days: any[];
+    absent_days?: any[];
     mispunch_criteria: string;
 }
 
