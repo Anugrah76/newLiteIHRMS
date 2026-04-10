@@ -38,7 +38,7 @@ export const usePunchTime = (date: string) => {
     return useQuery({
         queryKey: queryKeys.attendance.punchTime(date),
         queryFn: () => getPunchTime(date),
-        refetchInterval: 30000, // Refetch every 30 seconds
+        refetchInterval: 300000, // Refetch every 30 seconds
         enabled: !!date,
     });
 };

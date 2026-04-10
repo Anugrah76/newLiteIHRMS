@@ -5,7 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     TextInput,
-    KeyboardAvoidingView,
+    KeyboardAvoidingView, 
     Platform,
     ScrollView,
     Alert,

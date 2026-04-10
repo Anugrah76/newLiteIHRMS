@@ -55,10 +55,20 @@ export const getPunchTime = async (date: string): Promise<ApiResponse<PunchTime>
 };
 
 /**
+ * Punch Options API Response
+ * This endpoint returns: { status, emp_punch_option }
+ * emp_punch_option is a number: 1=normal, 2=biometric, 3=QR, 4=both
+ */
+export interface PunchOptionsResponse {
+    status: number;
+    emp_punch_option: number;
+}
+
+/**
  * Get punch attendance options
  * Original params: Only indo_code and key (auto-injected)
  */
-export const getPunchOptions = async (): Promise<ApiResponse<PunchOption[]>> => {
+export const getPunchOptions = async (): Promise<PunchOptionsResponse> => {
     const formData = new FormData();
     // No additional params needed, only indo_code and key from interceptor
 

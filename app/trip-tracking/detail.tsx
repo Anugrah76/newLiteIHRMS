@@ -5,7 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-    ActivityIndicator,
+    ActivityIndicator, 
     Dimensions,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';

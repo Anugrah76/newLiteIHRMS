@@ -10,6 +10,7 @@ import {
     Dimensions,
 } from 'react-native';
 import {
+    Home,
     X,
     User,
     ChevronRight,
@@ -24,6 +25,7 @@ import {
     Calendar,
     MapPin,
     BarChart3,
+    MessagesSquare,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@shared/theme';
@@ -48,15 +50,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ visible, onClose }) => {
     const menuItems = [
         { icon: User, label: 'Profile', route: '/profile' },
         { icon: Calendar, label: 'Attendance Management', route: '/attendance-options' },
-        { icon: MapPin, label: 'Trip Tracking', route: '/trip-tracking' },
-        { icon: BarChart3, label: 'Analytics', route: '/analytics' },
-        { icon: ListTodo, label: 'Time Sheet', route: '/(tabs)/timesheet' },
+        //  { icon: MapPin, label: 'Trip Tracking', route: '/trip-tracking' },
+        //{ icon: BarChart3, label: 'Analytics', route: '/analytics' },
+        { icon: ListTodo, label: 'Time Sheet', route: '/timesheet' },
         { icon: ClipboardCheck, label: 'Staff Management', route: '/staff-management' },
         { icon: Ticket, label: 'Support', route: '/ticket-hub' },
         { icon: PlaneTakeoff, label: 'BTA Management', route: '/bta-hub' },
         { icon: ScrollText, label: 'Dependents', route: '/dependents' },
         { icon: SquareMenu, label: 'Other Options', route: '/miscellaneous-hub' },
         { icon: IdCard, label: 'Visitor Notification', route: '/visitors' },
+        // { icon: MessagesSquare, label: 'Chat', route: '/chat' },
     ];
 
     const handleNavigation = (route: string) => {
@@ -85,12 +88,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ visible, onClose }) => {
                 {/* Sidebar */}
                 <View style={[styles.sidebar, { backgroundColor: theme.colors.surface }]}>
                     {/* Header */}
+
+
                     <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-                        <View style={[styles.versionBadge, { backgroundColor: theme.colors.surfaceVariant }]}>
-                            <Text style={[styles.versionText, { color: theme.colors.textSecondary }]}>
-                                v{appVersion}
-                            </Text>
-                        </View>
+                        <TouchableOpacity
+                            onPress={() => handleNavigation('/')}
+                            style={[styles.closeButton, { borderBottomColor: theme.colors.surfaceVariant }]}>
+                            <Home width={25} height={24} color={theme.colors.text} />
+                        </TouchableOpacity>
+
                         <TouchableOpacity
                             style={[styles.closeButton, { backgroundColor: theme.colors.surfaceVariant }]}
                             onPress={onClose}
@@ -152,6 +158,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ visible, onClose }) => {
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
+
+                    <View style={[styles.footer, { borderBottomColor: theme.colors.border }]}>
+                        <View style={[styles.versionBadge, { backgroundColor: theme.colors.surfaceVariant }]}>
+                            <Text style={[styles.versionText, { color: theme.colors.textSecondary }]}>
+                                v{appVersion}
+                            </Text>
+                        </View>
+
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -188,6 +203,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         paddingTop: Constants.statusBarHeight + 12,
+        borderBottomWidth: 1,
+    },
+    footer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        paddingBottom: 36,
+        paddingVertical: 12,
         borderBottomWidth: 1,
     },
     versionBadge: {

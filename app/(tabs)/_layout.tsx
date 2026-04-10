@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Calendar, FileText, User, Layers } from 'lucide-react-native';
+import { Home, Calendar, FileText, User, Layers, Target } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { useTheme } from '@shared/theme';
@@ -49,12 +49,13 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="timesheet"
+                name="daily-goals"
                 options={{
-                    title: 'Timesheet',
-                    tabBarIcon: ({ color, size }) => <FileText width={size} height={size} color={color} />,
+                    title: 'Goals',
+                    tabBarIcon: ({ color, size }) => <Target width={size} height={size} color={color} />,
                 }}
             />
+
             <Tabs.Screen
                 name="outProfile"
                 options={{

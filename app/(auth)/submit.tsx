@@ -11,6 +11,8 @@ import {
     TextInput,
     View,
     StatusBar,
+
+    Keyboard
 } from 'react-native';
 import { useToast } from '@shared/components/Toast';
 import { AnimatedGradientBackground } from '@shared/components/AnimatedGradientBackground';
@@ -19,15 +21,13 @@ import { useTheme } from '@shared/theme';
 
 const logo = require('../../assets/images/Ihrmslite.png');
 
-/**
- * Submit Screen - Professional Corporate Design
- * First screen in app flow - captures company code
- */
+
 export default function SubmitScreen() {
     const [companyId, setCompanyId] = useState('');
     const router = useRouter();
     const theme = useTheme();
     const toast = useToast();
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     const { mutate: submitCode, isPending } = useCompanyConfig();
 
@@ -37,8 +37,16 @@ export default function SubmitScreen() {
             return true;
         };
 
+        const showkeyDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+
         const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-        return () => backHandler.remove();
+        return () => {
+            showkeyDidShowListener.remove();
+            keyboardDidHideListener.remove();
+
+            backHandler.remove();
+        };
     }, []);
 
     const handleSubmit = () => {
@@ -65,17 +73,20 @@ export default function SubmitScreen() {
 
     return (
         <AnimatedGradientBackground>
+
             <StatusBar barStyle={theme.isDark ? 'light-content' : 'light-content'} />
 
             <View style={styles.container}>
                 {/* Logo */}
-                <View style={styles.logoContainer}>
-                    <View style={[styles.logoCircle, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
-                        <Image source={logo} style={styles.logo} />
+                {!isKeyboardVisible &&
+                    <View style={styles.logoContainer}>
+                        <View style={[styles.logoCircle, { backgroundColor: 'rgba(255, 255, 255, 0.54)' }]}>
+                            <Image source={logo} style={styles.logo} />
+                        </View>
+                        <Text style={styles.appName}>IHRMS</Text>
+                        <Text style={styles.appTagline}>Indovision</Text>
                     </View>
-                    <Text style={styles.appName}>IHRMS</Text>
-                    <Text style={styles.appTagline}>Human Resource Management System</Text>
-                </View>
+                }
 
                 {/* Card */}
                 <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary }]}>
@@ -132,6 +143,7 @@ export default function SubmitScreen() {
                     </View>
                 </View>
             </View>
+
         </AnimatedGradientBackground>
     );
 }
@@ -217,6 +229,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRightWidth: 1,
+        borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
     },

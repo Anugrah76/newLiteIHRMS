@@ -21,8 +21,9 @@ export const getCompanyConfig = async (controllerId: string): Promise<CompanyCon
         'https://info.indovisionservices.in/dev/v15/hrms_api/v7/api/appcontroller/appcontroller',
         { method: 'POST', body: formData }
     );
-    //console.log('response.json', response.json());
-    return response.json();
+    const data = await response.json();
+    console.log('response.json', data);
+    return data;
 };
 
 /**

@@ -20,58 +20,52 @@ interface Props {
 export const CorporateBackground: React.FC<Props> = ({ children }) => {
     const theme = useTheme();
 
-    // Main gradient - Creates the primary visual flow
+    // Main gradient - Minimal, professional base
     const mainGradient = theme.isDark ? {
         id: 'main-dark-gradient',
         colors: [
-            { color: 'rgba(15, 23, 42, 1)', offset: '0%' },       // Deep slate top
-            { color: 'rgba(30, 41, 59, 0.7)', offset: '30%' },    // Lighter slate
-            { color: 'rgba(15, 23, 42, 0.5)', offset: '60%' },    // Fade middle
-            { color: 'rgba(30, 41, 59, 0.7)', offset: '85%' },    // Return
-            { color: 'rgba(15, 23, 42, 1)', offset: '100%' },     // Deep bottom
+            { color: 'rgba(15, 23, 42, 1)', offset: '0%' },
+            { color: 'rgba(30, 41, 59, 0.98)', offset: '50%' },
+            { color: 'rgba(15, 23, 42, 1)', offset: '100%' },
         ],
         baseColor: '#0f172a',
     } : {
         id: 'main-light-gradient',
         colors: [
-            { color: 'rgba(248, 250, 252, 1)', offset: '0%' },    // Light slate top
-            { color: 'rgba(226, 232, 240, 0.6)', offset: '30%' }, // Subtle gray
-            { color: 'rgba(248, 250, 252, 0.4)', offset: '60%' }, // Fade middle
-            { color: 'rgba(226, 232, 240, 0.6)', offset: '85%' }, // Return
-            { color: 'rgba(248, 250, 252, 1)', offset: '100%' },  // Light bottom
+            { color: 'rgba(249, 250, 251, 1)', offset: '0%' },
+            { color: 'rgba(243, 244, 246, 0.99)', offset: '50%' },
+            { color: 'rgba(249, 250, 251, 1)', offset: '100%' },
         ],
-        baseColor: '#f8fafc',
+        baseColor: '#f9fafb',
     };
 
-    // Accent gradient - Adds subtle blue accent (corporate identity)
+    // Accent gradient - Extremely subtle depth
     const accentGradient = theme.isDark ? {
         id: 'accent-dark-gradient',
         colors: [
-            { color: 'rgba(30, 64, 175, 0.08)', offset: '0%' },   // Subtle blue top
-            { color: 'rgba(37, 99, 235, 0.05)', offset: '50%' },  // Lighter middle
-            { color: 'rgba(30, 64, 175, 0.08)', offset: '100%' }, // Subtle blue bottom
+            { color: 'rgba(71, 85, 105, 0.04)', offset: '0%' },
+            { color: 'rgba(100, 116, 139, 0.02)', offset: '100%' },
         ],
     } : {
         id: 'accent-light-gradient',
         colors: [
-            { color: 'rgba(37, 99, 235, 0.04)', offset: '0%' },   // Very subtle blue top
-            { color: 'rgba(59, 130, 246, 0.03)', offset: '50%' }, // Lighter middle
-            { color: 'rgba(37, 99, 235, 0.04)', offset: '100%' }, // Very subtle blue bottom
+            { color: 'rgba(148, 163, 184, 0.015)', offset: '0%' },
+            { color: 'rgba(203, 213, 225, 0.01)', offset: '100%' },
         ],
     };
 
-    // Texture gradient - Adds professional depth (diagonal)
+    // Texture gradient - Barely visible professional depth
     const textureGradient = theme.isDark ? {
         id: 'texture-dark-gradient',
         colors: [
-            { color: 'rgba(71, 85, 105, 0.03)', offset: '0%' },   // Slate texture
-            { color: 'rgba(100, 116, 139, 0.02)', offset: '100%' }, // Lighter texture
+            { color: 'rgba(51, 65, 85, 0.015)', offset: '0%' },
+            { color: 'rgba(71, 85, 105, 0.01)', offset: '100%' },
         ],
     } : {
         id: 'texture-light-gradient',
         colors: [
-            { color: 'rgba(148, 163, 184, 0.03)', offset: '0%' }, // Light texture
-            { color: 'rgba(203, 213, 225, 0.02)', offset: '100%' }, // Subtle texture
+            { color: 'rgba(226, 232, 240, 0.015)', offset: '0%' },
+            { color: 'rgba(241, 245, 249, 0.01)', offset: '100%' },
         ],
     };
 

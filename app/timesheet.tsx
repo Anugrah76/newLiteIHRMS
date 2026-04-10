@@ -9,7 +9,7 @@ import {
     TextInput,
     BackHandler,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
 import { Sidebar } from '@shared/components/Sidebar';
@@ -22,6 +22,7 @@ import { useToast } from '@shared/components/Toast';
 import { useAuthStore } from '@shared/store';
 import { Clock, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Save, Send, Plus, ClipboardList } from 'lucide-react-native';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, isFuture } from 'date-fns';
+import { NotificationService } from '@shared/utils/NotificationService';
 
 export default function TimesheetScreen() {
     const theme = useTheme();
@@ -49,6 +50,11 @@ export default function TimesheetScreen() {
 
     // Status Query (for Calendar)
     const { data: calendarStatus, isLoading: isCalendarLoading, refetch: refetchCalendar } = useTimesheetCalendar(monthName, yearStr);
+
+    // Schedule Daily Goal Notifications on mount
+    useEffect(() => {
+        NotificationService.scheduleDailyGoalReminders();
+    }, []);
 
     // Tasks Query (for Selected Date)
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
@@ -90,6 +96,50 @@ export default function TimesheetScreen() {
         setIsSubmittedState(tasksData?.data?.submit_status === 1);
     }, [tasksData]);
 
+    // Process goal submissions from Daily Goals screen
+    const params = useLocalSearchParams();
+    useEffect(() => {
+        if (params.goalSubmission && typeof params.goalSubmission === 'string' && tasksData?.data?.tasks) {
+            try {
+                const submission = JSON.parse(params.goalSubmission);
+                const { kraMoves, additionalTaskMoves, date: submissionDate } = submission;
+
+                // Verify date matches
+                const currentDate = format(selectedDate, 'yyyy-MM-dd');
+                if (submissionDate !== currentDate) return;
+
+                // Update KRA comments by merging with existing data
+                if (kraMoves && Object.keys(kraMoves).length > 0) {
+                    setKraFormData(prev => {
+                        const updated = { ...prev };
+                        Object.entries(kraMoves).forEach(([kraId, goals]) => {
+                            const goalsText = (goals as string[]).map(g => `Goal: ${g}`).join('\n\n');
+                            const currentComment = updated[kraId]?.comment || '';
+                            updated[kraId] = {
+                                ...updated[kraId],
+                                task_completed: updated[kraId]?.task_completed || '',
+                                timesheet_id: updated[kraId]?.timesheet_id || null,
+                                kra_id: kraId,
+                                comment: currentComment ? `${currentComment}\n\n${goalsText}` : goalsText
+                            };
+                        });
+                        return updated;
+                    });
+                }
+
+                // Update Additional Task
+                if (additionalTaskMoves && additionalTaskMoves.length > 0) {
+                    const goalsText = additionalTaskMoves.map((g: any) => `Goal: ${g}`).join('\n\n');
+                    setAdditionalTask(prev => prev ? `${prev}\n\n${goalsText}` : goalsText);
+                }
+
+                toast.show('success', 'Goals Added', 'Daily goals have been added to your timesheet');
+            } catch (error) {
+                console.error('Failed to process goal submission:', error);
+            }
+        }
+    }, [params.goalSubmission, tasksData]);
+
     const handleDateSelect = (date: Date) => {
         if (isFuture(date)) {
             toast.show('info', 'Future Date', 'Cannot access future dates');
@@ -105,6 +155,15 @@ export default function TimesheetScreen() {
             ...prev,
             [kraId]: { ...prev[kraId], [field]: value }
         }));
+    };
+
+    const handleAddGoalToKra = (kraId: string, goalText: string) => {
+        const currentComment = kraFormData[kraId]?.comment || '';
+        const newComment = currentComment
+            ? `${currentComment}\n\n✅ Goal: ${goalText}`
+            : `✅ Goal: ${goalText}`;
+        handleKraInputChange(kraId, 'comment', newComment);
+        toast.show('success', 'Added to KRA', 'Goal added to KRA comment successfully');
     };
 
     // Calendar Helpers
@@ -332,6 +391,7 @@ export default function TimesheetScreen() {
                         <Text style={[styles.tsDate, { color: theme.colors.text }]}>{format(selectedDate, 'EEEE, d MMMM')}</Text>
                         <Text style={[styles.tsSubtitle, { color: theme.colors.textSecondary }]}>Daily Timesheet</Text>
                     </View>
+
 
                     {/* KRA Section */}
                     <View style={[styles.section, { backgroundColor: theme.colors.cardPrimary, borderRadius: 12, padding: 16, marginBottom: 16 }]}>

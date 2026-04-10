@@ -66,7 +66,9 @@ export default function GamificationWellnessScreen() {
         // Add week offs and holidays
         if (attendanceData.result.weekoff) {
             attendanceData.result.weekoff.forEach((wo: any) => {
-                attendanceDays.push({ status: 'Week Off', date: wo.date || wo });
+                if (wo) {
+                    attendanceDays.push({ status: 'Week Off', date: wo.date || wo });
+                }
             });
         }
 
@@ -104,10 +106,12 @@ export default function GamificationWellnessScreen() {
             leaveData
         );
 
-        const holidays = (attendanceData.result.holiday_days || []).map((h: any) => ({
-            date: h.date,
-            name: h.name
-        }));
+        const holidays = (attendanceData.result.holiday_days || [])
+            .filter((h: any) => h)
+            .map((h: any) => ({
+                date: h?.date,
+                name: h?.name
+            }));
 
         const recommendations = WellnessAnalytics.generateRecommendations(
             wellnessScore,

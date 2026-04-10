@@ -9,6 +9,7 @@ export type {
     PunchTime,
     AttendanceRecord,
     PunchOption,
+    PunchOptionsResponse,
     MarkAttendanceRequest,
     AttendanceRecordsRequest
 } from '../api/attendanceApi';

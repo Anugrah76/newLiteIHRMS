@@ -121,7 +121,7 @@ export const getMyEvents = async (payload: MyEventsPayload): Promise<ApiResponse
 
     // Strict FormData per requirement
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.getMyEvents(), formData);
     console.log('✅ [getMyEvents] Response:', data);
@@ -138,7 +138,7 @@ export const createEvent = async (payload: CreateEventPayload): Promise<ApiRespo
     const formData = new FormData();
     Object.keys(payload).forEach(key => {
         if (key !== 'uploadedFiles') {
-            formData.append(key, payload[key]);
+            formData.append(key, (payload as Record<string, any>)[key]);
         }
     });
 
@@ -230,7 +230,7 @@ export const cancelEvent = async (payload: { event_id: string; cancel_by: string
     console.log('🔍 [cancelEvent] Payload:', payload);
 
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.cancelEvent(), formData);
 
@@ -260,7 +260,7 @@ export const createEventTravel = async (payload: CreateTravelPayload): Promise<A
     console.log('🔍 [createEventTravel] Payload:', payload);
 
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.createEventTravel(), formData);
     console.log('✅ [createEventTravel] Response:', data);
@@ -272,7 +272,7 @@ export const updateEventTravel = async (payload: UpdateTravelPayload): Promise<A
     console.log('🔍 [updateEventTravel] Payload:', payload);
 
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.updateEventTravel(), formData);
     console.log('✅ [updateEventTravel] Response:', data);
@@ -295,7 +295,7 @@ export const createEventHotel = async (payload: CreateHotelPayload): Promise<Api
     console.log('🔍 [createEventHotel] Requesting:', API_ENDPOINTS.createEventHotel());
     console.log('🔍 [createEventHotel] Payload:', payload);
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.createEventHotel(), formData);
     console.log('✅ [createEventHotel] Response:', data);
@@ -306,7 +306,7 @@ export const updateEventHotel = async (payload: UpdateHotelPayload): Promise<Api
     console.log('🔍 [updateEventHotel] Requesting:', API_ENDPOINTS.updateEventHotel());
     console.log('🔍 [updateEventHotel] Payload:', payload);
     const formData = new FormData();
-    Object.keys(payload).forEach(key => formData.append(key, payload[key]));
+    Object.keys(payload).forEach(key => formData.append(key, (payload as Record<string, any>)[key]));
 
     const { data } = await apiClient.post(API_ENDPOINTS.updateEventHotel(), formData);
     console.log('✅ [updateEventHotel] Response:', data);

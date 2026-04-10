@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     View,
     Text,
-    StyleSheet,
+    StyleSheet, 
     TouchableOpacity,
     ScrollView,
     Dimensions,

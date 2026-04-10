@@ -107,7 +107,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                 activeOpacity={0.8}
             >
                 <View style={styles.selectContent}>
-                    {selectedOption.icon && !isCompact && (
+                    {'icon' in selectedOption && selectedOption.icon && !isCompact && (
                         <View style={[styles.selectIconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
                             <selectedOption.icon size={18} color={theme.colors.primary} />
                         </View>
@@ -118,7 +118,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
                             styles.selectText,
                             { color: theme.colors.text },
                             !value && { color: theme.colors.textTertiary, fontWeight: '500' },
-                            selectedOption.icon && !isCompact && styles.selectTextWithIcon,
+                            'icon' in selectedOption && selectedOption.icon && !isCompact && styles.selectTextWithIcon,
                             isCompact && styles.selectTextCompact,
                             textStyle,
                         ]}

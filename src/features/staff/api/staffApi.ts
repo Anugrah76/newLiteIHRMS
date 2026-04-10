@@ -94,8 +94,8 @@ export interface BTARequest {
     bt_id: string;
     indo_code: string;
     resource_name: string;
-    from_date: string;
-    to_date: string;
+    start_date: string;
+    end_date: string;
     destination: string;
     purpose: string;
     status: string;
@@ -267,13 +267,16 @@ export const getTravelTypes = async (): Promise<ApiResponse<{ travel_types: Trav
 
 export const createBTAEvent = async (formData: FormData): Promise<ApiResponse<any>> => {
     console.log('🔍 [createBTAEvent] Requesting:', API_ENDPOINTS.createEvent());
+
     const { data } = await apiClient.post(API_ENDPOINTS.createEvent(), formData);
+    console.log('create event ', data);
     return data;
 };
 
 export const submitBTAEvent = async (payload: any): Promise<ApiResponse<any>> => {
     console.log('🔍 [submitBTAEvent] Requesting:', API_ENDPOINTS.submitEvent());
     const { data } = await apiClient.post(API_ENDPOINTS.submitEvent(), payload);
+    console.log('submite event ', data);
     return data;
 };
 

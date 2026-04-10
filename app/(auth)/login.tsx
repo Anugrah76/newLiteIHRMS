@@ -7,6 +7,7 @@ import {
     Image,
     Pressable,
     StyleSheet,
+    Keyboard,
     Text,
     TextInput,
     View,
@@ -34,6 +35,8 @@ export default function LoginScreen() {
     const theme = useTheme();
     const toast = useToast();
 
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
     const companyConfig = useConfigStore((state) => state.companyConfig);
     const { mutate: loginUser, isPending } = useLogin();
 
@@ -43,8 +46,17 @@ export default function LoginScreen() {
             return true;
         };
 
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () =>
+            setKeyboardVisible(true));
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () =>
+            setKeyboardVisible(false));
+
         const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-        return () => backHandler.remove();
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+            backHandler.remove();
+        }
     }, [router]);
 
     const handleLogin = async () => {
@@ -106,24 +118,26 @@ export default function LoginScreen() {
 
             <View style={styles.container}>
                 {/* Company Logo */}
-                <View style={styles.logoContainer}>
-                    <View style={[styles.logoCircle, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
-                        <Image
-                            source={companyConfig?.logo_url ? { uri: companyConfig.logo_url } : defaultLogo}
-                            style={styles.logo}
-                        />
+                {!isKeyboardVisible &&
+                    <View style={styles.logoContainer}>
+                        <View style={[styles.logoCircle, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
+                            <Image
+                                source={companyConfig?.logo_url ? { uri: companyConfig.logo_url } : defaultLogo}
+                                style={styles.logo}
+                            />
+                        </View>
+                        {/*   <Text style={styles.companyName}>
+                            {companyConfig?.company_name || ''}
+                        </Text> */}
                     </View>
-                    <Text style={styles.companyName}>
-                        {companyConfig?.company_name || 'Organization'}
-                    </Text>
-                </View>
+                }
 
                 {/* Login Card */}
                 <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary }]}>
                     <View style={[styles.cardHeader, { borderBottomColor: theme.colors.border }]}>
                         <Text style={[styles.title, { color: theme.colors.text }]}>Employee Login</Text>
                         <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                            Enter your credentials to access the system
+                            Enter your same credentials that you use to access the IHRMS website
                         </Text>
                     </View>
 
@@ -309,6 +323,7 @@ const styles = StyleSheet.create({
     iconBox: {
         width: 48,
         height: 48,
+        borderRadius: 6,
         borderRightWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',

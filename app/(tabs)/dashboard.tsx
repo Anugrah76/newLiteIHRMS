@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Clock, Calendar, FileText, Award, BadgeIndianRupee } from 'lucide-react-native';
+import { Clock, Calendar, FileText, Award, BadgeIndianRupee, TentTree } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
     View,
@@ -13,13 +13,17 @@ import {
     Platform,
 } from 'react-native';
 import Constants from 'expo-constants';
-import { useAuthStore, useConfigStore } from '@shared/store';
-import { usePunchTime } from '@features/dashboard/hooks';
+import { useAuthStore, useConfigStore, usePunchOptionStore } from '@shared/store';
+import { usePunchTime, useTodayKRATasks } from '@features/dashboard/hooks';
+import { DailyGoalsCard } from '@features/dashboard/components/DailyGoalsCard';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@shared/theme';
 import { WelcomeCardGradient } from '@shared/components/WelcomeCardGradient';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
 import { Sidebar } from '@shared/components/Sidebar';
+import { getPunchOptions } from '@features/attendance/api/attendanceApi';
+import { useToast } from '@shared/components/Toast';
 
 /**
  * Dashboard Screen
@@ -33,6 +37,10 @@ export default function DashboardScreen() {
     const companyConfig = useConfigStore((state) => state.companyConfig);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [sidebarVisible, setSidebarVisible] = useState(false);
+    const [punchLoading, setPunchLoading] = useState(false);
+    const setPunchOptions = usePunchOptionStore((state) => state.setPunchOptions);
+    const setEmpOption = usePunchOptionStore((state) => state.setEmpOption);
+    const toast = useToast();
 
     // Get today's date in DD-MM-YYYY format
     const today = () => {
@@ -46,14 +54,41 @@ export default function DashboardScreen() {
     // React Query - auto-fetches and caches punch time
     const { data: punchTime, isLoading, error } = usePunchTime(today());
 
-    // Update current time every minute
+    // Fetch today's KRA tasks for goals integration
+    const { data: tasksData } = useTodayKRATasks();
+    const tasks = tasksData?.data?.tasks || [];
+
+    // Update current time every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date());
-        }, 60000);
+        }, 1000);
 
         return () => clearInterval(timer);
     }, []);
+
+    /**
+     * Handle Mark Attendance press
+     * Fetches punch options from API, stores in Zustand, then navigates
+     * (mirrors the old project's handlePunch flow)
+     */
+    const handlePunch = async () => {
+        setPunchLoading(true);
+        try {
+            const result = await getPunchOptions();
+            if (result && result.status === 1 && result.emp_punch_option) {
+                setEmpOption(Number(result.emp_punch_option));
+                router.push('/mark-attendance');
+            } else {
+                toast.show('error', 'No Punch Option Set', 'Try again');
+            }
+        } catch (error) {
+            console.error('Punch Options Error:', error);
+            toast.show('error', 'Network Error', 'Please try later');
+        } finally {
+            setPunchLoading(false);
+        }
+    };
 
     const quickActions = [
         {
@@ -62,7 +97,7 @@ export default function DashboardScreen() {
             subtitle: 'View your attendance history',
             color: '#0369a1',
             bgColor: '#f0f9ff',
-            onPress: () => router.push('/(tabs)/attendance'),
+            onPress: () => router.push('/attendance'),
         },
         {
             icon: FileText,
@@ -78,7 +113,7 @@ export default function DashboardScreen() {
             subtitle: 'Track your working hours',
             color: '#dc2626',
             bgColor: '#fef2f2',
-            onPress: () => router.push('/(tabs)/timesheet'),
+            onPress: () => router.push('/timesheet'),
         },
         {
             icon: BadgeIndianRupee,
@@ -88,7 +123,45 @@ export default function DashboardScreen() {
             bgColor: '#f0fdfa',
             onPress: () => router.push('/transferred-salary'),
         },
+        {
+            icon: TentTree,
+            title: 'Holidays',
+            subtitle: 'View holidays',
+            color: '#0f766e',
+            bgColor: '#f0fdfa',
+            onPress: () => router.push('/holidays'),
+        }
     ];
+
+    // Get gradient colors based on time of day
+    // Get gradient colors based on time of day
+    const getTimeBasedGradient = () => {
+        const hour = currentTime.getHours();
+
+        if (hour >= 5 && hour < 12) {
+            return theme.isDark
+                ? ['#A8EDEA', '#87CEEB', '#B0E0E6'] as const
+                : ['#B8E6F0', '#A8D8EA', '#C8E6F5'] as const;
+
+        } else if (hour >= 12 && hour < 17) {
+            return theme.isDark
+                ? ['#FF9A8B', '#FFB6A3', '#FFDAC1'] as const
+                : ['#FFE5B4', '#FFD4A3', '#FFC48C'] as const;
+
+
+        } else if (hour >= 17 && hour < 20) {
+            return theme.isDark
+                ? ['#FFB88C', '#FF9A8B', '#EF8481'] as const
+                : ['#FFDAB9', '#FFCBA4', '#FFB88C'] as const;
+        } else {
+            return theme.isDark
+                ? ['#667EEA', '#764BA2', '#8B7FC7'] as const
+                : ['#C5CAE9', '#B39DDB', '#9FA8DA'] as const;
+        }
+    };
+
+    const gradientColors = getTimeBasedGradient();
+    const textColor = theme.isDark ? '#FFFFFF' : '#2D3748';
 
     const getGreeting = () => {
         const hour = currentTime.getHours();
@@ -113,7 +186,12 @@ export default function DashboardScreen() {
                 >
                     {/* Welcome Section */}
                     <View style={styles.welcomeSection}>
-                        <WelcomeCardGradient>
+                        <LinearGradient
+                            colors={gradientColors}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.welcomeCardGradient}
+                        >
                             <View style={styles.welcomeCardContent}>
                                 <View style={styles.profilePhotoContainer}>
                                     <Image
@@ -127,81 +205,104 @@ export default function DashboardScreen() {
                                 </View>
 
                                 <View style={styles.welcomeContent}>
-                                    <Text style={styles.welcomeText}>{getGreeting()}</Text>
-                                    <Text style={styles.userName}>{user?.fullName || 'Employee'}</Text>
-                                    <Text style={styles.userCode}>{user?.emp_code || ''}</Text>
+                                    <Text style={[styles.welcomeText, { color: textColor }]}>{getGreeting()}</Text>
+                                    <Text style={[styles.userName, { color: textColor }]}>{user?.fullName || 'Employee'}</Text>
+                                    <Text style={[styles.userCode, { color: textColor, opacity: 0.7 }]}>{user?.emp_code || ''}</Text>
                                 </View>
                             </View>
-                        </WelcomeCardGradient>
+                        </LinearGradient>
                     </View>
 
                     {/* Today's Status */}
                     <View style={styles.section}>
                         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Today's Status</Text>
 
-                        {isLoading ? (
-                            <View style={[styles.attendanceCard, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                                <ActivityIndicator size="large" color={theme.colors.primary} />
-                            </View>
-                        ) : punchTime ? (
-                            <View style={[styles.attendanceCard, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                                <View style={styles.attendanceHeader}>
-                                    <View style={styles.attendanceStatus}>
-                                        <View
-                                            style={[
-                                                styles.statusIndicator,
-                                                { backgroundColor: punchTime.punch_out_time ? theme.colors.success : theme.colors.warning },
-                                            ]}
-                                        />
-                                        <Text style={[styles.statusText, { color: theme.colors.text }]}>{punchTime.punch_date}</Text>
-                                    </View>
-                                </View>
-
-                                <View style={styles.timeCardsContainer}>
-                                    <View style={[styles.timeCard, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.border }]}>
-                                        <View style={styles.timeCardHeader}>
-                                            <View style={styles.timeIconContainer}>
-                                                <Clock width={16} height={16} color={theme.colors.success} />
-                                            </View>
-                                            <Text style={[styles.timeCardLabel, { color: theme.colors.textSecondary }]}>Check In</Text>
+                        <LinearGradient
+                            colors={gradientColors}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.attendanceCard}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator size="large" color={textColor} />
+                            ) : punchTime ? (
+                                <>
+                                    <View style={styles.attendanceHeader}>
+                                        <View style={styles.attendanceStatus}>
+                                            <View
+                                                style={[
+                                                    styles.statusIndicator,
+                                                    { backgroundColor: punchTime.punch_out_time ? theme.colors.success : theme.colors.warning },
+                                                ]}
+                                            />
+                                            <Text style={[styles.statusText, { color: textColor }]}>{currentTime.toDateString()}</Text>
                                         </View>
-                                        <Text style={[styles.timeCardValue, { color: theme.colors.text }]}>
-                                            {punchTime.punch_in_time || '--:--'}
+                                        <Text style={[styles.statusText, { color: textColor }]}>
+                                            {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                         </Text>
                                     </View>
 
-                                    <View style={[styles.timeCard, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.border }]}>
-                                        <View style={styles.timeCardHeader}>
-                                            <View style={styles.timeIconContainer}>
-                                                <Clock width={16} height={16} color={theme.colors.error} />
+                                    <View style={styles.timeCardsContainer}>
+                                        <View style={[styles.timeCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)' }]}>
+                                            <View style={styles.timeCardHeader}>
+                                                <View style={styles.timeIconContainer}>
+                                                    <Clock width={16} height={16} color={theme.colors.success} />
+                                                </View>
+                                                <Text style={[styles.timeCardLabel, { color: textColor, opacity: 0.7 }]}>Check In</Text>
                                             </View>
-                                            <Text style={[styles.timeCardLabel, { color: theme.colors.textSecondary }]}>Check Out</Text>
+                                            <Text style={[styles.timeCardValue, { color: textColor }]}>
+                                                {punchTime.punch_in_time || '--:--'}
+                                            </Text>
                                         </View>
-                                        <Text style={[styles.timeCardValue, { color: theme.colors.text }]}>
-                                            {punchTime.punch_out_time || '--:--'}
-                                        </Text>
+
+                                        <View style={[styles.timeCard, { backgroundColor: theme.isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)' }]}>
+                                            <View style={styles.timeCardHeader}>
+                                                <View style={styles.timeIconContainer}>
+                                                    <Clock width={16} height={16} color={theme.colors.error} />
+                                                </View>
+                                                <Text style={[styles.timeCardLabel, { color: textColor, opacity: 0.7 }]}>Check Out</Text>
+                                            </View>
+                                            <Text style={[styles.timeCardValue, { color: textColor }]}>
+                                                {punchTime.punch_in_time === punchTime.punch_out_time ? currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : (punchTime.punch_out_time || '--:--')}
+                                            </Text>
+                                        </View>
                                     </View>
-                                </View>
-                            </View>
-                        ) : (
-                            <View style={[styles.attendanceCard, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                                </>
+                            ) : (
                                 <View style={styles.noDataContainer}>
-                                    <Clock width={32} height={32} color={theme.colors.textTertiary} />
-                                    <Text style={[styles.noDataTitle, { color: theme.colors.textSecondary }]}>No attendance recorded</Text>
-                                    <Text style={[styles.noDataSubtitle, { color: theme.colors.textTertiary }]}>Mark your attendance to start tracking</Text>
+                                    <Clock width={32} height={32} color={textColor} opacity={0.5} />
+                                    <Text style={[styles.noDataTitle, { color: textColor }]}>No attendance recorded</Text>
+                                    <Text style={[styles.noDataSubtitle, { color: textColor, opacity: 0.7 }]}>Mark your attendance to start tracking</Text>
                                 </View>
-                            </View>
-                        )}
+                            )}
+                        </LinearGradient>
 
                         {/* Mark Attendance Button */}
                         <TouchableOpacity
                             style={[styles.markAttendanceButton, { backgroundColor: theme.colors.primary }]}
-                            onPress={() => router.push('/mark-attendance')}
+                            onPress={handlePunch}
+                            disabled={punchLoading}
                             activeOpacity={0.8}
                         >
-                            <Clock width={20} height={20} color="#ffffff" />
-                            <Text style={styles.markAttendanceText}>Mark Attendance</Text>
+                            {punchLoading ? (
+                                <>
+                                    <ActivityIndicator size="small" color="#ffffff" />
+                                    <Text style={styles.markAttendanceText}>Processing...</Text>
+                                </>
+                            ) : (
+                                <>
+                                    <Clock width={20} height={20} color="#ffffff" />
+                                    <Text style={styles.markAttendanceText}>Mark Attendance</Text>
+                                </>
+                            )}
                         </TouchableOpacity>
+
+                        {/* Daily Goals Card */}
+                        <DailyGoalsCard
+                            maxVisible={4}
+                            onExpand={() => router.push('/(tabs)/daily-goals')}
+                            kraList={tasks}
+                        />
                     </View>
 
                     {/* Quick Actions */}
@@ -258,6 +359,9 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         overflow: 'hidden',
     },
+    welcomeCardGradient: {
+        borderRadius: 12,
+    },
     welcomeCardContent: {
         flexDirection: 'row',
         padding: 24,
@@ -302,6 +406,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 20,
         borderWidth: 1,
+        borderColor: '#e0e7ff',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
@@ -330,13 +435,14 @@ const styles = StyleSheet.create({
     },
     timeCardsContainer: {
         flexDirection: 'row',
+
         gap: 12,
     },
     timeCard: {
         flex: 1,
         borderRadius: 8,
         padding: 16,
-        borderWidth: 1,
+        //borderWidth: 1,
     },
     timeCardHeader: {
         flexDirection: 'row',

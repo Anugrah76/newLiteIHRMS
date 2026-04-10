@@ -7,6 +7,8 @@ Notifications.setNotificationHandler({
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
     }),
 });
 
@@ -95,6 +97,91 @@ export const NotificationService = {
                     repeats: true,
                 },
             });
+        }
+    },
+
+    /**
+     * Schedule Daily Goal Reminders
+     * - Morning: 10:00 AM - "Set your goal for the day!"
+     * - Evening: 6:00 PM - "Did you complete your goal?"
+     */
+    scheduleDailyGoalReminders: async () => {
+        try {
+            // Cancel any existing daily goal notifications
+            const allNotifications = await Notifications.getAllScheduledNotificationsAsync();
+            const goalNotifications = allNotifications.filter(
+                n => n.content.title?.includes('Goal') || n.identifier.includes('daily_goal')
+            );
+
+            for (const notification of goalNotifications) {
+                await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+            }
+
+            // Calculate seconds until next 10 AM
+            const now = new Date();
+            const morningTime = new Date();
+            morningTime.setHours(10, 0, 0, 0);
+            if (now.getTime() >= morningTime.getTime()) {
+                morningTime.setDate(morningTime.getDate() + 1);
+            }
+            const secondsUntilMorning = Math.floor((morningTime.getTime() - now.getTime()) / 1000);
+
+            // Morning Reminder - 10:00 AM
+            console.log('📅 Scheduling Daily Goal Morning Reminder (10:00 AM)...');
+            await Notifications.scheduleNotificationAsync({
+                identifier: 'daily_goal_morning',
+                content: {
+                    title: "🎯 Set Your Goal for Today!",
+                    body: "Take a moment to set your main goal for the day.",
+                    sound: true,
+                },
+                trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                    seconds: secondsUntilMorning,
+                    repeats: true,
+                },
+            });
+
+            // Calculate seconds until next 6 PM
+            const eveningTime = new Date();
+            eveningTime.setHours(18, 0, 0, 0);
+            if (now.getTime() >= eveningTime.getTime()) {
+                eveningTime.setDate(eveningTime.getDate() + 1);
+            }
+            const secondsUntilEvening = Math.floor((eveningTime.getTime() - now.getTime()) / 1000);
+
+            // Evening Reminder - 6:00 PM
+            console.log('📅 Scheduling Daily Goal Evening Reminder (6:00 PM)...');
+            await Notifications.scheduleNotificationAsync({
+                identifier: 'daily_goal_evening',
+                content: {
+                    title: "✅ Goal Check-In",
+                    body: "Did you complete your goal for today?",
+                    sound: true,
+                },
+                trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                    seconds: secondsUntilEvening,
+                    repeats: true,
+                },
+            });
+
+            console.log('✅ Daily Goal reminders scheduled successfully');
+        } catch (error) {
+            console.error('❌ Error scheduling daily goal reminders:', error);
+        }
+    },
+
+    /**
+     * Cancel Daily Goal Reminders
+     */
+    cancelDailyGoalReminders: async () => {
+        try {
+            await Notifications.cancelScheduledNotificationAsync('daily_goal_morning');
+            await Notifications.cancelScheduledNotificationAsync('daily_goal_evening');
+            console.log('✅ Daily Goal reminders cancelled');
+        } catch (error) {
+            console.error('❌ Error cancelling daily goal reminders:', error);
         }
     },
 

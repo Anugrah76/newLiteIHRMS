@@ -167,7 +167,7 @@ export default function UnifiedCalendarScreen() {
     const holidayDays = extractDates(attendanceResult?.holiday_days || [], 'holiday');
     const mispunchDays = extractDates(attendanceResult?.mispunch_days || [], 'mispunch');
     const weekOffDays = extractDates(attendanceResult?.weekoff || [], 'weekoff');
-    const absentDays = extractDates(attendanceResult?.absent_days || [], 'absent');
+    // const absentDays = extractDates(attendanceResult?.absent_days || [], 'absent');
 
     const attendanceStatusMap = new Map<string, string>();
     presentDays.forEach(d => attendanceStatusMap.set(d, 'present'));
@@ -176,7 +176,7 @@ export default function UnifiedCalendarScreen() {
     holidayDays.forEach(d => attendanceStatusMap.set(d, 'holiday'));
     mispunchDays.forEach(d => attendanceStatusMap.set(d, 'mispunch'));
     weekOffDays.forEach(d => attendanceStatusMap.set(d, 'weekoff'));
-    absentDays.forEach(d => attendanceStatusMap.set(d, 'absent'));
+    //absentDays.forEach(d => attendanceStatusMap.set(d, 'absent'));
 
     // Extract Timesheet Data
     const timesheetSubmittedDates = timesheetStatus?.submittedDates || [];
@@ -563,9 +563,9 @@ export default function UnifiedCalendarScreen() {
                                 </View>
                                 {selectedDay.attendance.status ? (
                                     <View style={styles.detailContent}>
-                                        <View style={[styles.statusBadge, { backgroundColor: selectedDay.attendance.color + '20', borderColor: selectedDay.attendance.color }]}>
-                                            <View style={[styles.statusDotLarge, { backgroundColor: selectedDay.attendance.color }]} />
-                                            <Text style={[styles.statusText, { color: selectedDay.attendance.color }]}>
+                                        <View style={[styles.statusBadge, { backgroundColor: (selectedDay.attendance.color || '#000000') + '20', borderColor: selectedDay.attendance.color || 'transparent' }]}>
+                                            <View style={[styles.statusDotLarge, { backgroundColor: selectedDay.attendance.color || 'transparent' }]} />
+                                            <Text style={[styles.statusText, { color: selectedDay.attendance.color || theme.colors.text }]}>
                                                 {selectedDay.attendance.label}
                                             </Text>
                                         </View>
@@ -583,9 +583,9 @@ export default function UnifiedCalendarScreen() {
                                 </View>
                                 {selectedDay.timesheet.status ? (
                                     <View style={styles.detailContent}>
-                                        <View style={[styles.statusBadge, { backgroundColor: selectedDay.timesheet.color + '20', borderColor: selectedDay.timesheet.color }]}>
-                                            <View style={[styles.statusDotLarge, { backgroundColor: selectedDay.timesheet.color }]} />
-                                            <Text style={[styles.statusText, { color: selectedDay.timesheet.color }]}>
+                                        <View style={[styles.statusBadge, { backgroundColor: (selectedDay.timesheet.color || '#000000') + '20', borderColor: selectedDay.timesheet.color || 'transparent' }]}>
+                                            <View style={[styles.statusDotLarge, { backgroundColor: selectedDay.timesheet.color || 'transparent' }]} />
+                                            <Text style={[styles.statusText, { color: selectedDay.timesheet.color || theme.colors.text }]}>
                                                 {selectedDay.timesheet.label}
                                             </Text>
                                         </View>
@@ -733,13 +733,7 @@ export default function UnifiedCalendarScreen() {
             />
             <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
                 <View style={styles.content}>
-                    {/* Info Card */}
-                    <View style={[styles.infoCard, { backgroundColor: theme.colors.primary + '15', borderColor: theme.colors.primary }]}>
-                        <CalendarIcon size={20} color={theme.colors.primary} />
-                        <Text style={[styles.infoText, { color: theme.colors.primary }]}>
-                            Unified view of Attendance, Timesheet & Leave
-                        </Text>
-                    </View>
+
 
                     {renderCalendar()}
                 </View>

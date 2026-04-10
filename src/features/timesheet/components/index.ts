@@ -1,0 +1,1 @@
+export { DailyGoalsManager } from './DailyGoalsManager';

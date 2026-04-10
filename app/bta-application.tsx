@@ -56,10 +56,10 @@ export default function BTAApplicationScreen() {
     const { data: travelModesData, isLoading: modesLoading } = useTravelModes();
     const { data: travelTypesData, isLoading: typesLoading } = useTravelTypes();
 
-    const travelModes = travelModesData?.data?.travel_modes || [];
-    const travelTypes = travelTypesData?.data?.travel_types || [];
+    const travelModes = (travelModesData as any)?.travel_modes || [];
+    const travelTypes = (travelTypesData as any)?.travel_types || [];
 
-    // Mutations
+    // Mutations 
     const createEventMutation = useCreateBTAEvent();
     const submitEventMutation = useSubmitBTAEvent();
 
@@ -74,6 +74,8 @@ export default function BTAApplicationScreen() {
             const formatted = `${day}-${month}-${year}`;
             handleInputChange('fromDate', formatted);
         }
+
+        console.log('travelModes', travelModes, 'travelTypes', travelTypes);
     }, [selectedDate]);
 
     const handleInputChange = useCallback((field: string, value: any) => {
@@ -176,7 +178,7 @@ export default function BTAApplicationScreen() {
         formDataToSend.append("manager_id", user?.manager_id || "EC-100");
         formDataToSend.append("is_manager_change", isManagerChange ? "YES" : "NO");
         formDataToSend.append("manager_code", user?.manager_indo_code || '');
-
+        console.log(formDataToSend);
         formData.uploadedFiles.forEach((file) => {
             formDataToSend.append("userfiles", {
                 uri: file.uri,
@@ -590,8 +592,8 @@ const styles = StyleSheet.create({
     fileSize: { fontSize: 12 },
     submitButton: { paddingVertical: 18, borderRadius: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, marginTop: 8 },
     submitButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-    modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%' },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center' },
+    modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%', margin: 10 },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1 },
     modalTitle: { fontSize: 18, fontWeight: '700' },
     modalOption: { padding: 16, borderBottomWidth: 1 },

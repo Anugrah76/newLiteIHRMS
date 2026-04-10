@@ -3,3 +3,4 @@ export { useConfigStore, type CompanyConfig } from './configStore';
 export { useAuthStore, type User } from './authStore';
 export { useThemeStore, type ColorScheme } from './themeStore';
 export { useSidebarStore } from './sidebarStore';
+export { usePunchOptionStore } from './punchOptionStore';

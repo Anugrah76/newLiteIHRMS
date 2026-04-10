@@ -5,7 +5,7 @@ import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
 import { Sidebar } from '@shared/components/Sidebar';
 import { useTheme } from '@shared/theme';
-import { Calendar, Clock, Gift, FileText } from 'lucide-react-native';
+import { Calendar, Clock, Gift, FileText, TentTree } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const isTablet = width > 768;
@@ -28,7 +28,7 @@ export default function AttendanceOptionsHub() {
             id: 2,
             title: 'Holiday List',
             subtitle: 'Company holidays calendar',
-            icon: Gift,
+            icon: TentTree,
             color: '#F59E0B',
             route: '/holidays'
         },

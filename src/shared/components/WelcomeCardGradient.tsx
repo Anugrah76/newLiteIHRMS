@@ -19,7 +19,7 @@ export const WelcomeCardGradient: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         // Update time every minute
         const interval = setInterval(() => {
-            setCurrentHour(new Date().getHours());
+            setCurrentHour(10);
         }, 60000);
 
         return () => clearInterval(interval);
