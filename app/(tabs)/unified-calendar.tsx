@@ -208,6 +208,26 @@ export default function UnifiedCalendarScreen() {
         holidayDays = extractDates(attendanceResult?.holiday_days || [], 'holiday');
         mispunchDays = extractDates(attendanceResult?.mispunch_days || [], 'mispunch');
         weekOffDays = extractDates(attendanceResult?.weekoff || [], 'weekoff');
+
+        // Calculate absent days: past dates not in any other category
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const allKnownDates = new Set([
+            ...presentDays, ...leaveDays, ...compOffDays,
+            ...holidayDays, ...mispunchDays, ...weekOffDays,
+        ]);
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const checkDate = new Date(year, month, day);
+            if (checkDate > today) continue;
+            const dateStr = formatDate(checkDate);
+            if (!allKnownDates.has(dateStr)) {
+                absentDays.push(dateStr);
+            }
+        }
     }
 
     const attendanceStatusMap = new Map<string, string>();

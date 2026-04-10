@@ -93,7 +93,10 @@ export default function LoginScreen() {
                 },
                 onError: (error: any) => {
                     console.error('Login error:', error);
-                    toast.show('error', 'Network Error', 'Unable to connect to server');
+                    const apiMessage = error?.response?.data?.message
+                        || error?.message
+                        || 'Unable to connect to server';
+                    toast.show('error', 'Login Failed', apiMessage);
                 },
             });
         } catch (error) {

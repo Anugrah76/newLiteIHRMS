@@ -75,7 +75,8 @@ export const useLogin = () => {
                     manager_id: data.manager_id,
                     manager_indo_code: data.manager_indo_code,
                     username: data.username,
-                    user_type: data.user_type
+                    user_type: data.user_type,
+                    profile_photo: data.profile_photo || data.profile_pic || '',
                 };
 
                 // Save to Zustand store
