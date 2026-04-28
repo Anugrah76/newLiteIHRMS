@@ -68,8 +68,8 @@ export const NotificationService = {
             console.log('🔔 Scheduling DEBUG notification (Every 60s)...');
             await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: "⏳ Timesheet Reminder (Test)",
-                    body: "This is a test reminder to fill your timesheet!",
+                    title: "⏳ Timesheet Reminder",
+                    body: "This is a reminder to fill your timesheet!",
                     sound: true,
                 },
                 trigger: {

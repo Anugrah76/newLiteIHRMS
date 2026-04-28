@@ -125,8 +125,17 @@ export default function MyTicketsScreen() {
         }
     };
 
-    const handleTicketClick = (ticketId: string) => {
-        router.push(`/ticket-chat?ticketId=${ticketId}`);
+    const handleTicketClick = (ticket: any) => {
+        const params = new URLSearchParams({
+            ticketId: ticket.ticket_id,
+            subject: ticket.subject || '',
+            detailed: ticket.detailed || '',
+            priority: ticket.priority || '',
+            status: ticket.status || '',
+            personName: ticket.department_person_name || '',
+            createDatetime: ticket.create_datetime || '',
+        });
+        router.push(`/ticket-chat?${params.toString()}`);
     };
 
     return (
@@ -169,7 +178,7 @@ export default function MyTicketsScreen() {
                                         borderLeftColor: getPriorityColor(ticket.priority)
                                     }
                                 ]}
-                                onPress={() => handleTicketClick(ticket.ticket_id)}
+                                onPress={() => handleTicketClick(ticket)}
                                 activeOpacity={0.7}
                             >
                                 <View style={styles.ticketHeader}>

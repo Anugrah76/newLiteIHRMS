@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
-import { Clock, Calendar, FileText, Award, BadgeIndianRupee, TentTree } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { Clock, Calendar, FileText, Award, BadgeIndianRupee, TentTree, Home } from 'lucide-react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -52,7 +52,14 @@ export default function DashboardScreen() {
     };
 
     // React Query - auto-fetches and caches punch time
-    const { data: punchTime, isLoading, error } = usePunchTime(today());
+    const { data: punchTime, isLoading, error, refetch } = usePunchTime(today());
+
+    // Refetch punch time every time this screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
 
     // Fetch today's KRA tasks for goals integration
     const { data: tasksData } = useTodayKRATasks();
@@ -263,7 +270,7 @@ export default function DashboardScreen() {
                                                 <Text style={[styles.timeCardLabel, { color: textColor, opacity: 0.7 }]}>Check Out</Text>
                                             </View>
                                             <Text style={[styles.timeCardValue, { color: textColor }]}>
-                                                {punchTime.punch_in_time === punchTime.punch_out_time ? currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : (punchTime.punch_out_time || '--:--')}
+                                                {punchTime.punch_out_time || '--:--'}
                                             </Text>
                                         </View>
                                     </View>
@@ -277,25 +284,38 @@ export default function DashboardScreen() {
                             )}
                         </LinearGradient>
 
-                        {/* Mark Attendance Button */}
-                        <TouchableOpacity
-                            style={[styles.markAttendanceButton, { backgroundColor: theme.colors.primary }]}
-                            onPress={handlePunch}
-                            disabled={punchLoading}
-                            activeOpacity={0.8}
-                        >
-                            {punchLoading ? (
-                                <>
-                                    <ActivityIndicator size="small" color="#ffffff" />
-                                    <Text style={styles.markAttendanceText}>Processing...</Text>
-                                </>
-                            ) : (
-                                <>
-                                    <Clock width={20} height={20} color="#ffffff" />
-                                    <Text style={styles.markAttendanceText}>Mark Attendance</Text>
-                                </>
-                            )}
-                        </TouchableOpacity>
+                        {/* Attendance Action Buttons Row */}
+                        <View style={styles.actionButtonsRow}>
+                            {/* Mark Attendance Button */}
+                            <TouchableOpacity
+                                style={[styles.markAttendanceButton, { backgroundColor: theme.colors.primary }]}
+                                onPress={handlePunch}
+                                disabled={punchLoading}
+                                activeOpacity={0.8}
+                            >
+                                {punchLoading ? (
+                                    <>
+                                        <ActivityIndicator size="small" color="#ffffff" />
+                                        <Text style={styles.markAttendanceText}>Processing...</Text>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Clock width={18} height={18} color="#ffffff" />
+                                        <Text style={styles.markAttendanceText}>Mark Attendance</Text>
+                                    </>
+                                )}
+                            </TouchableOpacity>
+
+                            {/* Work From Home Button */}
+                            <TouchableOpacity
+                                style={styles.wfhButton}
+                                onPress={() => router.push('/work-from-home')}
+                                activeOpacity={0.8}
+                            >
+                                <Home width={18} height={18} color="#ffffff" />
+                                <Text style={styles.markAttendanceText}>Work From Home</Text>
+                            </TouchableOpacity>
+                        </View>
 
                         {/* Daily Goals Card */}
                         <DailyGoalsCard
@@ -518,24 +538,47 @@ const styles = StyleSheet.create({
         height: 60,
         resizeMode: 'contain',
     },
+    actionButtonsRow: {
+        flexDirection: 'row',
+        gap: 10,
+        marginTop: 16,
+    },
     markAttendanceButton: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 16,
+        paddingVertical: 14,
+        paddingHorizontal: 8,
         borderRadius: 12,
-        marginTop: 16,
-        gap: 12,
+        gap: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
     },
+    wfhButton: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 8,
+        borderRadius: 12,
+        gap: 8,
+        backgroundColor: '#10B981',
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+    },
     markAttendanceText: {
         color: '#ffffff',
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '600',
-        letterSpacing: 0.5,
+        letterSpacing: 0.3,
+        textAlign: 'center',
     },
 });

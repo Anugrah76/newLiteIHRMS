@@ -28,13 +28,15 @@
       }
     },
     "production": {
+
+      "node": "20.19.4",
       "env": {
         "NODE_ENV": "production",
         "EXPO_USE_METRO_WORKSPACE_ROOT": "1"
       },
       "autoIncrement": true,
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "ios": {
         "distribution": "store"

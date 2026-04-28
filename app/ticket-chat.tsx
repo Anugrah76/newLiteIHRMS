@@ -14,7 +14,7 @@ import { Sidebar } from '@shared/components/Sidebar';
 import { useAuthStore } from '@shared/store';
 import { useToast } from '@shared/components/Toast';
 import { useTheme } from '@shared/theme';
-import { Clock, MessageCircle, Paperclip, User } from 'lucide-react-native';
+import { AlertCircle, Calendar, Clock, MessageCircle, Paperclip, Tag, User } from 'lucide-react-native';
 import { apiClient } from '@shared/api/client';
 import { API_ENDPOINTS } from '@shared/api/endpoints';
 
@@ -22,7 +22,15 @@ export default function TicketChatScreen() {
     const router = useRouter();
     const toast = useToast();
     const theme = useTheme();
-    const { ticketId } = useLocalSearchParams();
+    const { ticketId, subject, detailed, priority, status: ticketStatus, personName, createDatetime } = useLocalSearchParams<{
+        ticketId: string;
+        subject: string;
+        detailed: string;
+        priority: string;
+        status: string;
+        personName: string;
+        createDatetime: string;
+    }>();
     const user = useAuthStore(state => state.user);
 
     const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -71,6 +79,24 @@ export default function TicketChatScreen() {
             toast.show("error", errorMessage);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const getPriorityColor = (p: string) => {
+        switch (p?.toLowerCase()) {
+            case 'high': return '#DC2626';
+            case 'medium': return '#D97706';
+            case 'low': return '#059669';
+            default: return '#6B7280';
+        }
+    };
+
+    const getStatusColor = (s: string) => {
+        switch (s?.toLowerCase()) {
+            case 'open': return '#3B82F6';
+            case 'closed': return '#059669';
+            case 'draft': return '#D97706';
+            default: return '#6B7280';
         }
     };
 
@@ -170,11 +196,56 @@ export default function TicketChatScreen() {
             />
             <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100, padding: 16 }}>
                 <View style={[styles.ticketInfoCard, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                    {/* Header */}
                     <View style={styles.ticketInfoHeader}>
-                        <MessageCircle size={24} color={theme.colors.primary} />
+                        <MessageCircle size={22} color={theme.colors.primary} />
                         <Text style={[styles.ticketInfoTitle, { color: theme.colors.text }]}>Ticket Details</Text>
+                        <View style={[styles.statusPill, { backgroundColor: getStatusColor(ticketStatus) }]}>
+                            <Text style={styles.statusPillText}>{ticketStatus || 'Unknown'}</Text>
+                        </View>
                     </View>
+
+                    {/* Ticket ID & Subject */}
                     <Text style={[styles.ticketIdText, { color: theme.colors.textSecondary }]}>Ticket ID: #{ticketId}</Text>
+                    {!!subject && (
+                        <Text style={[styles.subjectText, { color: theme.colors.text }]}>{subject}</Text>
+                    )}
+
+                    <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+
+                    {/* Meta rows */}
+                    {!!personName && (
+                        <View style={styles.infoRow}>
+                            <User size={15} color={theme.colors.textSecondary} />
+                            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Assigned To</Text>
+                            <Text style={[styles.infoValue, { color: theme.colors.text }]}>{personName}</Text>
+                        </View>
+                    )}
+                    {!!priority && (
+                        <View style={styles.infoRow}>
+                            <Tag size={15} color={getPriorityColor(priority)} />
+                            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Priority</Text>
+                            <Text style={[styles.infoValue, { color: getPriorityColor(priority), fontWeight: '700' }]}>{priority}</Text>
+                        </View>
+                    )}
+                    {!!createDatetime && (
+                        <View style={styles.infoRow}>
+                            <Calendar size={15} color={theme.colors.textSecondary} />
+                            <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>Created</Text>
+                            <Text style={[styles.infoValue, { color: theme.colors.text }]}>{formatDate(createDatetime)}</Text>
+                        </View>
+                    )}
+
+                    {/* Description / Detailed */}
+                    {!!detailed && (
+                        <View style={[styles.detailedBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+                            <View style={styles.detailedHeader}>
+                                <AlertCircle size={15} color={theme.colors.primary} />
+                                <Text style={[styles.detailedLabel, { color: theme.colors.primary }]}>Description</Text>
+                            </View>
+                            <Text style={[styles.detailedText, { color: theme.colors.text }]}>{detailed}</Text>
+                        </View>
+                    )}
                 </View>
 
                 {ticketData?.ticket_replies?.length > 0 ? (
@@ -233,8 +304,65 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     ticketIdText: {
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: '500',
+        marginBottom: 2,
+    },
+    subjectText: {
+        fontSize: 17,
+        fontWeight: '700',
+        marginTop: 4,
+        lineHeight: 23,
+    },
+    statusPill: {
+        marginLeft: 'auto',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
+    statusPillText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    divider: {
+        height: 1,
+        marginVertical: 12,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+    },
+    infoLabel: {
+        fontSize: 13,
+        width: 90,
+    },
+    infoValue: {
+        fontSize: 13,
+        fontWeight: '600',
+        flex: 1,
+    },
+    detailedBox: {
+        marginTop: 8,
+        borderRadius: 10,
+        padding: 12,
+        borderWidth: 1,
+    },
+    detailedHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginBottom: 6,
+    },
+    detailedLabel: {
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    detailedText: {
+        fontSize: 14,
+        lineHeight: 21,
     },
     chatContainer: {
         flex: 1,

@@ -2,7 +2,7 @@
   "expo": {
     "name": "iHRMS Lite",
     "slug": "ihrmsliteapp",
-    "version": "2.19.0",
+    "version": "3.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ihrmsliteapp",
@@ -66,7 +66,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a3026c69-b20e-47e7-93e3-ca33f25576b1"
+        "projectId": "0559b40c-6d58-4204-ae4c-348ec70efdc4"
       }
     }
   }
