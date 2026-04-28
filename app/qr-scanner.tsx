@@ -7,6 +7,27 @@ import { useToast } from '@shared/components/Toast';
 import { ArrowLeft, QrCode } from 'lucide-react-native';
 import * as Location from 'expo-location';
 
+// Retry GPS until accuracy is acceptable, mirroring AlmostFinal behaviour
+async function getQuickLocation(
+    maxAttempts = 3,
+    minAccuracy = 100
+): Promise<Location.LocationObjectCoords | null> {
+    for (let i = 0; i < maxAttempts; i++) {
+        try {
+            const loc = await Location.getCurrentPositionAsync({});
+            if (loc?.coords?.latitude && loc.coords.accuracy != null && loc.coords.accuracy < minAccuracy) {
+                return loc.coords;
+            }
+            // Last attempt — return whatever we have
+            if (i === maxAttempts - 1) return loc?.coords ?? null;
+        } catch (e) {
+            if (i === maxAttempts - 1) return null;
+        }
+        await new Promise(r => setTimeout(r, 300));
+    }
+    return null;
+}
+
 export default function QRScannerScreen() {
     const router = useRouter();
     const toast = useToast();
@@ -52,11 +73,15 @@ export default function QRScannerScreen() {
         if (!coords?.latitude) throw new Error("Location unavailable");
         if (!qrData) throw new Error("Invalid QR code");
 
+        const indoCode = user?.emp_code || user?.indo_code || "";
+        const apiKey = user?.api_key || "";
+        if (!indoCode || !apiKey) throw new Error("Missing user credentials");
+
         const baseUrl = qrData.includes('?') ? qrData : `${qrData}?`;
         const params = new URLSearchParams({
             mode: "1",
-            indo_code: user?.emp_code || user?.indo_code || "",
-            key: user?.api_key || "",
+            indo_code: indoCode,
+            key: apiKey,
             email: user?.username || "null",
             lat: String(coords.latitude),
             long: String(coords.longitude),
@@ -75,10 +100,11 @@ export default function QRScannerScreen() {
         try {
             console.log('🔍 [QR Scan] Scanned data:', data);
 
+            // Try cached location first, then retry with GPS
             let coords = location?.coords;
             if (!coords?.latitude) {
-                const loc = await Location.getCurrentPositionAsync({});
-                coords = loc.coords;
+                console.log('🔍 [QR Scan] No cached location, retrying GPS...');
+                coords = await getQuickLocation(3, 100);
             }
 
             if (!coords) throw new Error("Location unavailable. Enable GPS.");
@@ -87,6 +113,8 @@ export default function QRScannerScreen() {
             console.log('🔍 [QR Scan] Attendance URL:', attendanceUrl);
 
             const response = await fetch(attendanceUrl, { method: "GET" });
+            if (!response.ok) throw new Error(`Network error: ${response.status}`);
+
             const result = await response.json();
             console.log('✅ [QR Scan] Response:', result);
 
