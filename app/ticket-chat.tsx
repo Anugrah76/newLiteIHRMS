@@ -186,7 +186,6 @@ export default function TicketChatScreen() {
             </CorporateBackground>
         );
     }
-
     return (
         <CorporateBackground>
             <TopBar
