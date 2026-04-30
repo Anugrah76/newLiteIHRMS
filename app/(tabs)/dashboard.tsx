@@ -313,7 +313,7 @@ export default function DashboardScreen() {
                                 activeOpacity={0.8}
                             >
                                 <Home width={18} height={18} color="#ffffff" />
-                                <Text style={styles.markAttendanceText}>Work From Home</Text>
+                                <Text style={styles.markAttendanceText}>WFH</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -567,8 +567,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         borderRadius: 12,
         gap: 8,
-        backgroundColor: '#10B981',
-        shadowColor: '#10B981',
+        backgroundColor: '#3a60acff',
+        // shadowColor: '#3a60acff',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -576,9 +576,9 @@ const styles = StyleSheet.create({
     },
     markAttendanceText: {
         color: '#ffffff',
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '600',
-        letterSpacing: 0.3,
+        letterSpacing: 0.1,
         textAlign: 'center',
     },
 });

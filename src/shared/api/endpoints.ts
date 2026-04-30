@@ -67,6 +67,8 @@ export const API_ENDPOINTS = {
     startWork: () => '/WFH/start_work',
     stopWork: () => '/WFH/stop_work',
     logsWork: () => '/WFH/get_my_logs',
+    wfhFilter: () => '/WFH/filter',
+    endDay: () => '/WFH/end_day',
 
     // ---------------- SALARY ----------------
     salaryDetail: () => '/salary/get_salary_detail',

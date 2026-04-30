@@ -28,7 +28,6 @@
       }
     },
     "production": {
-
       "node": "20.19.4",
       "env": {
         "NODE_ENV": "production",
@@ -36,7 +35,7 @@
       },
       "autoIncrement": true,
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "apk"
       },
       "ios": {
         "distribution": "store"

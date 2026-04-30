@@ -489,6 +489,60 @@ export const useStopWork = () => {
     return useMutation({ mutationFn: stopWork });
 };
 
+// WFH Filter (Work Logs by Date)
+export interface WfhLogEntry {
+    id: string;
+    indo_code: string;
+    work_date: string;
+    start_time: string;
+    end_time: string | null;
+    work_hours: string | null;
+    remarks: string | null;
+    current_status: string;
+    application: string;
+}
+
+export interface WfhFilterResponse {
+    response: string;
+    message: string;
+    total_work_hours: string;
+    data: WfhLogEntry[];
+}
+
+export const getWfhFilter = async (workDate: string): Promise<WfhFilterResponse> => {
+    console.log('🔍 [getWfhFilter] Requesting:', API_ENDPOINTS.wfhFilter(), 'for date:', workDate);
+    const formData = new FormData();
+    formData.append('work_date', workDate);
+    // Auth (key, indo_code) injected by interceptor
+    const { data } = await apiClient.post(API_ENDPOINTS.wfhFilter(), formData);
+    return data;
+};
+
+export const useWfhFilter = () => {
+    return useMutation({ mutationFn: getWfhFilter });
+};
+
+export const endDay = async (payload: {
+    work_date: string;
+    start_time: string;
+    status: string;
+    remarks: string;
+}): Promise<ApiResponse<any>> => {
+    console.log('🔍 [endDay] Requesting:', API_ENDPOINTS.endDay());
+    const formData = new FormData();
+    formData.append('work_date', payload.work_date);
+    formData.append('start_time', payload.start_time);
+    formData.append('status', payload.status);
+    formData.append('remarks', payload.remarks);
+    // Auth injected by interceptor
+    const { data } = await apiClient.post(API_ENDPOINTS.endDay(), formData);
+    return data;
+};
+
+export const useEndDay = () => {
+    return useMutation({ mutationFn: endDay });
+};
+
 // ============================================================================
 // Missed Punch API Functions
 // ============================================================================

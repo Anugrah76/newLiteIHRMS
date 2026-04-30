@@ -3,7 +3,7 @@ import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform
 } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system/next';
 import * as Sharing from 'expo-sharing';
 import { useRouter } from 'expo-router';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
@@ -141,16 +141,15 @@ export default function TransferredSalaryScreen() {
             const monthShort = salaryMonth ? salaryMonth.substring(0, 3).toUpperCase() : 'SAL';
             const fileName = `Salary_Slip_${monthShort}_${new Date().toISOString().split('T')[0]}.pdf`;
 
-            const downloadResumable = FileSystem.createDownloadResumable(
-                url,
-                `${FileSystem.documentDirectory}${fileName}`,
-                {},
-            );
+            const destination = new File(Paths.cache, fileName);
+            if (destination.exists) {
+                destination.delete();
+            }
+            const outputFile = await File.downloadFileAsync(url, destination);
 
-            const result = await downloadResumable.downloadAsync();
-            if (result && result.uri) {
+            if (outputFile.exists) {
                 if (await Sharing.isAvailableAsync()) {
-                    await Sharing.shareAsync(result.uri, {
+                    await Sharing.shareAsync(outputFile.uri, {
                         mimeType: 'application/pdf',
                         dialogTitle: 'Share Salary Slip',
                         UTI: 'public.pdf'
