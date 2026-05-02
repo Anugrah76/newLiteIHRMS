@@ -23,9 +23,9 @@ export interface Dependent {
  */
 export interface DependentRequest {
     dependent_name: string;
-    relationship: string;
-    date_of_birth: string; // DD-MM-YYYY
-    gender: string;
+    dependent_relation: string;
+    dependent_dob: string; // DD-MM-YYYY
+    gender?: string;
     phone?: string;
     dependent_age?: string;
     aadhar_number?: string;
@@ -58,13 +58,13 @@ export const addDependent = async (params: DependentRequest): Promise<ApiRespons
 
     // CRITICAL: Must use exact parameter names as original
     formData.append('dependent_name', params.dependent_name);
-    formData.append('relationship', params.relationship);
-    formData.append('date_of_birth', params.date_of_birth);
-    formData.append('gender', params.gender);
+    formData.append('dependent_relation', params.dependent_relation);
+    formData.append('dependent_dob', params.dependent_dob);
+    //formData.append('gender', params.gender);
 
-    if (params.phone) {
-        formData.append('phone', params.phone);
-    }
+    /*     if (params.phone) {
+            formData.append('phone', params.phone);
+        } */
     if (params.dependent_age) {
         formData.append('dependent_age', params.dependent_age);
     }
@@ -93,15 +93,15 @@ export const addDependent = async (params: DependentRequest): Promise<ApiRespons
 export const updateDependent = async (dependentId: string, params: DependentRequest): Promise<ApiResponse<any>> => {
     const formData = new FormData();
 
-    formData.append('dependent_id', dependentId);
+    formData.append('id', dependentId);
     formData.append('dependent_name', params.dependent_name);
-    formData.append('relationship', params.relationship);
-    formData.append('date_of_birth', params.date_of_birth);
-    formData.append('gender', params.gender);
+    formData.append('dependent_relation', params.dependent_relation);
+    formData.append('dependent_dob', params.dependent_dob);
+    //formData.append('gender', params.gender);
 
-    if (params.phone) {
-        formData.append('phone', params.phone);
-    }
+    /*  if (params.phone) {
+         formData.append('phone', params.phone);
+     } */
     if (params.dependent_age) {
         formData.append('dependent_age', params.dependent_age);
     }
@@ -129,7 +129,7 @@ export const updateDependent = async (dependentId: string, params: DependentRequ
  */
 export const deleteDependent = async (dependentId: string): Promise<ApiResponse<any>> => {
     const formData = new FormData();
-    formData.append('dependent_id', dependentId);
+    formData.append('id', dependentId);
     // indo_code and key auto-injected by interceptor
 
     console.log('🔍 [deleteDependent] API Endpoint:', API_ENDPOINTS.deleteDependent());

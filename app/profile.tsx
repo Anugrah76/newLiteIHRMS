@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
@@ -21,6 +21,7 @@ export default function ProfileScreen() {
 
     // Use React Query hook instead of manual fetch
     const { data: profileInfo, isLoading, error } = useProfileInfo();
+
 
     // Show error toast if API fails
     if (error) {
@@ -102,7 +103,7 @@ export default function ProfileScreen() {
                             <InfoRow icon={MapPin} label="Bank Address" value={profileInfo?.bank?.bank_address} color="#10B981" />
                             <InfoRow icon={User} label="Account Holder" value={profileInfo?.bank?.account_holder_name} color="#10B981" />
                             <InfoRow icon={Hash} label="Account Number" value={profileInfo?.bank?.account_number} color="#10B981" />
-                            <InfoRow icon={Hash} label="IFSC Code" value={profileInfo?.bank?.ifsc} color="#10B981" />
+                            <InfoRow icon={Hash} label="IFSC Code" value={profileInfo?.bank?.isfc} color="#10B981" />
                         </InfoCard>
                     </>
                 )}

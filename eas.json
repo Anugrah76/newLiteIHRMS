@@ -16,7 +16,7 @@
     },
     "preview": {
       "android": {
-        "buildType": "apk",
+        "buildType": "app-bundle",
         "distribution": "internal",
         "gradleCommand": ":app:assembleRelease"
       },
@@ -35,7 +35,7 @@
       },
       "autoIncrement": true,
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "ios": {
         "distribution": "store"

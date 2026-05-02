@@ -32,11 +32,25 @@ apiClient.interceptors.request.use(
             const user = useAuthStore.getState().user;
 
             if (user) {
+                // Safely check if keys exist in FormData (handles both Web and React Native)
+                let hasIndoCode = false;
+                let hasKey = false;
+
+                if (typeof config.data.has === 'function') {
+                    hasIndoCode = config.data.has('indo_code');
+                    hasKey = config.data.has('key');
+                } else if ((config.data as any)._parts) {
+                    // React Native FormData fallback
+                    const parts = (config.data as any)._parts;
+                    hasIndoCode = parts.some((part: any[]) => part[0] === 'indo_code');
+                    hasKey = parts.some((part: any[]) => part[0] === 'key');
+                }
+
                 // Only append if not already present
-                if (!config.data.has('indo_code') && user.indo_code) {
+                if (!hasIndoCode && user.indo_code) {
                     config.data.append('indo_code', user.indo_code);
                 }
-                if (!config.data.has('key') && user.api_key) {
+                if (!hasKey && user.api_key) {
                     config.data.append('key', user.api_key);
                 }
 

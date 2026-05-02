@@ -456,30 +456,6 @@ export const useCancelEvent = () => {
 // Work From Home (WFH) API Functions
 // ============================================================================
 
-export const startWork = async (): Promise<ApiResponse<any>> => {
-    console.log('🔍 [startWork] Requesting:', API_ENDPOINTS.startWork());
-    const formData = new FormData();
-    // Auth injected by interceptor
-    const { data } = await apiClient.post(API_ENDPOINTS.startWork(), formData);
-    return data;
-};
-
-export const stopWork = async (payload: {
-    work_date: string;
-    start_time: string;
-    status: string;
-    remarks: string;
-}): Promise<ApiResponse<any>> => {
-    console.log('🔍 [stopWork] Requesting:', API_ENDPOINTS.stopWork());
-    const formData = new FormData();
-    formData.append('work_date', payload.work_date);
-    formData.append('start_time', payload.start_time);
-    formData.append('status', payload.status);
-    formData.append('remarks', payload.remarks);
-    // Auth injected by interceptor
-    const { data } = await apiClient.post(API_ENDPOINTS.stopWork(), formData);
-    return data;
-};
 
 export const useStartWork = () => {
     return useMutation({ mutationFn: startWork });
@@ -509,35 +485,10 @@ export interface WfhFilterResponse {
     data: WfhLogEntry[];
 }
 
-export const getWfhFilter = async (workDate: string): Promise<WfhFilterResponse> => {
-    console.log('🔍 [getWfhFilter] Requesting:', API_ENDPOINTS.wfhFilter(), 'for date:', workDate);
-    const formData = new FormData();
-    formData.append('work_date', workDate);
-    // Auth (key, indo_code) injected by interceptor
-    const { data } = await apiClient.post(API_ENDPOINTS.wfhFilter(), formData);
-    return data;
-};
-
 export const useWfhFilter = () => {
     return useMutation({ mutationFn: getWfhFilter });
 };
 
-export const endDay = async (payload: {
-    work_date: string;
-    start_time: string;
-    status: string;
-    remarks: string;
-}): Promise<ApiResponse<any>> => {
-    console.log('🔍 [endDay] Requesting:', API_ENDPOINTS.endDay());
-    const formData = new FormData();
-    formData.append('work_date', payload.work_date);
-    formData.append('start_time', payload.start_time);
-    formData.append('status', payload.status);
-    formData.append('remarks', payload.remarks);
-    // Auth injected by interceptor
-    const { data } = await apiClient.post(API_ENDPOINTS.endDay(), formData);
-    return data;
-};
 
 export const useEndDay = () => {
     return useMutation({ mutationFn: endDay });
@@ -589,4 +540,88 @@ export const useMissPunchList = () => {
 
 export const useApproveMissPunch = () => {
     return useMutation({ mutationFn: approveMissPunch });
+};
+
+
+
+
+
+// Reusable helper — put this at the top of staffApi.ts
+const buildWfhFormData = async (extra?: Record<string, string>): Promise<FormData> => {
+    const { useAuthStore } = await import('@shared/store');
+    const user = useAuthStore.getState().user;
+
+    const formData = new FormData();
+    if (user?.indo_code) formData.append('indo_code', user.indo_code);
+    if (user?.api_key) formData.append('key', user.api_key);
+
+    if (extra) {
+        Object.entries(extra).forEach(([k, v]) => formData.append(k, v));
+    }
+    return formData;
+};
+
+// staffApi.ts
+export const startWork = async (payload?: { work_date?: string }): Promise<ApiResponse<any>> => {
+    const { useAuthStore } = await import('@shared/store');
+    const user = useAuthStore.getState().user;
+
+    const today = new Date();
+    const work_date = payload?.work_date ??
+        `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    const formData = new FormData();
+    formData.append('indo_code', user?.indo_code ?? '');
+    formData.append('key', user?.api_key ?? '');
+    formData.append('work_date', work_date);
+
+    const { data } = await apiClient.post(API_ENDPOINTS.startWork(), formData);
+    return data;
+};
+export const stopWork = async (payload: {
+    work_date: string;
+    start_time: string;
+    status: string;
+    remarks: string;
+}): Promise<ApiResponse<any>> => {
+    const formData = await buildWfhFormData({
+        work_date: payload.work_date,
+        start_time: payload.start_time,
+        status: payload.status,
+        remarks: payload.remarks,
+    });
+
+    console.log('🔍 [stopWork] payload:', payload);
+    const { data } = await apiClient.post(API_ENDPOINTS.stopWork(), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+};
+
+export const endDay = async (payload: {
+    work_date: string;
+
+    remarks: string;
+}): Promise<ApiResponse<any>> => {
+    const formData = await buildWfhFormData({
+        work_date: payload.work_date,
+
+        remarks: payload.remarks,
+    });
+
+    console.log('🔍 [endDay] payload:', payload);
+    const { data } = await apiClient.post(API_ENDPOINTS.endDay(), formData, {
+        headers: { 'Content-Type': 'application/json' },
+    });
+    return data;
+};
+
+export const getWfhFilter = async (workDate: string): Promise<WfhFilterResponse> => {
+    const formData = await buildWfhFormData({ work_date: workDate });
+
+    console.log('🔍 [getWfhFilter] work_date:', workDate);
+    const { data } = await apiClient.post(API_ENDPOINTS.logsWork(), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
 };

@@ -57,8 +57,9 @@ export default function DependentsScreen() {
 
     const genderOptions = ['Male', 'Female', 'Other'];
 
-    const totalDependents = dependents?.data?.length || 0;
-    const nomineeCount = dependents?.data?.filter(d => d.nominee === 'Yes').length || 0;
+    const dependentsList = Array.isArray(dependents?.data) ? dependents.data : [];
+    const totalDependents = dependentsList.length;
+    const nomineeCount = dependentsList.filter((d: any) => d.nominee === 'Yes').length;
 
     const resetForm = () => {
         setEditingId(null);
@@ -79,12 +80,12 @@ export default function DependentsScreen() {
     };
 
     const openEditModal = (dep: any) => {
-        setEditingId(dep.dependent_id);
+        setEditingId(dep.id);
         setName(dep.dependent_name);
-        setRelationship(dep.relationship);
-        setDob(dep.date_of_birth);
-        setGender(dep.gender || 'Male');
-        setContact(dep.phone || '');
+        setRelationship(dep.dependent_relation);
+        setDob(dep.dependent_dob);
+        // setGender(dep.gender || 'Male');
+        // setContact(dep.phone || '');
         setAge(dep.dependent_age || '');
         setAadhar(dep.aadhar_number || '');
         setNominee(dep.nominee === 'Yes');
@@ -100,10 +101,8 @@ export default function DependentsScreen() {
 
         const payload = {
             dependent_name: name,
-            relationship,
-            date_of_birth: dob,
-            gender,
-            phone: contact,
+            dependent_relation: relationship,
+            dependent_dob: dob,
             dependent_age: age,
             aadhar_number: aadhar,
             nominee: nominee ? 'Yes' : 'No'
@@ -238,8 +237,8 @@ export default function DependentsScreen() {
                             Loading dependents...
                         </Text>
                     </View>
-                ) : (dependents?.data?.length || 0) > 0 ? (
-                    dependents?.data?.map((dep, index) => {
+                ) : dependentsList.length > 0 ? (
+                    dependentsList.map((dep: any, index: number) => {
                         const isNominee = dep.nominee === 'Yes';
                         const borderColor = isNominee ? '#8B5CF6' : '#6366F1';
 
@@ -281,7 +280,7 @@ export default function DependentsScreen() {
                                     )}
                                     <View style={styles.detailRow}>
                                         <Text style={[styles.detailLabel, { color: theme.colors.textSecondary }]}>DOB:</Text>
-                                        <Text style={[styles.detailValue, { color: theme.colors.text }]}>{formatDate(dep.date_of_birth)}</Text>
+                                        <Text style={[styles.detailValue, { color: theme.colors.text }]}>{formatDate(dep.dependent_dob.toString())}</Text>
                                     </View>
                                     {dep.aadhar_number && (
                                         <View style={styles.detailRow}>
@@ -307,7 +306,7 @@ export default function DependentsScreen() {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[styles.actionButton, { backgroundColor: theme.colors.error + '15' }]}
-                                        onPress={() => handleDelete(dep.dependent_id, dep.dependent_name)}
+                                        onPress={() => handleDelete(dep.id, dep.dependent_name)}
                                     >
                                         <Trash2 size={16} color={theme.colors.error} />
                                         <Text style={[styles.actionButtonText, { color: theme.colors.error }]}>Delete</Text>
@@ -358,9 +357,9 @@ export default function DependentsScreen() {
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Relationship *</Text>
+                                {/*                                 <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Relationship *</Text> */}
                                 <SelectField
-                                    label="Relationship"
+                                    label="Relationship *"
                                     value={relationship}
                                     onValueChange={setRelationship}
                                     options={relationOptions}
@@ -415,7 +414,7 @@ export default function DependentsScreen() {
                                 />
                             </View>
 
-                            <View style={styles.inputGroup}>
+                            {/*                             <View style={styles.inputGroup}>
                                 <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Gender</Text>
                                 <View style={styles.genderRow}>
                                     {genderOptions.map((opt) => (
@@ -437,9 +436,9 @@ export default function DependentsScreen() {
                                         </TouchableOpacity>
                                     ))}
                                 </View>
-                            </View>
+                            </View> */}
 
-                            <View style={styles.inputGroup}>
+                            {/*                             <View style={styles.inputGroup}>
                                 <Text style={[styles.label, { color: theme.colors.textSecondary }]}>Contact Number</Text>
                                 <TextInput
                                     style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
@@ -449,7 +448,7 @@ export default function DependentsScreen() {
                                     keyboardType="phone-pad"
                                     placeholderTextColor={theme.colors.textTertiary}
                                 />
-                            </View>
+                            </View> */}
 
                             <View style={styles.checkboxRow}>
                                 <CustomCheckbox value={nominee} onValueChange={setNominee} />

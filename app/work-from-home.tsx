@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-    View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Platform
+    View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Platform
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
@@ -24,6 +24,21 @@ export default function WorkFromHomeScreen() {
     const [remarks, setRemarks] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    const confirmEndDay = async () => {
+        setShowConfirmModal(false); // Close modal when starting the API call
+    };
+
+
+    const handleEndDayPress = () => {
+        if (!remarks.trim()) {
+            toast.show('error', 'Error', 'Please enter remarks');
+            return;
+        }
+        setShowConfirmModal(true);
+    };
+
 
     // Persisted WFH session state (survives navigation & app restart)
     const isWorkStarted = useWfhStore(state => state.isWorkStarted);
@@ -119,7 +134,8 @@ export default function WorkFromHomeScreen() {
         try {
             console.log('🔍 [Start Work] Initiating...');
 
-            const result = await startWorkMutation.mutateAsync();
+            const todayStr = formatDateForApi(new Date());
+            const result = await startWorkMutation.mutateAsync({ work_date: todayStr });
             console.log('✅ [Start Work] API result:', JSON.stringify(result));
 
             if (result) {
@@ -234,6 +250,10 @@ export default function WorkFromHomeScreen() {
             return;
         }
 
+        setShowConfirmModal(false);
+
+
+
         try {
             const session = await getActiveSessionParams();
             if (!session) return;
@@ -245,10 +265,10 @@ export default function WorkFromHomeScreen() {
                 remarks: remarks
             };
 
-            console.log('🔍 [End Day] Payload:', JSON.stringify(payload));
+            console.log('🔍 [Stop Work] Payload:', JSON.stringify(payload));
 
-            const result = await endDayMutation.mutateAsync(payload);
-            console.log('✅ [End Day] Response:', JSON.stringify(result));
+            const result = await stopWorkMutation.mutateAsync(payload);
+            console.log('✅ [Stop Work] Response:', JSON.stringify(result));
 
             if (result) {
                 setDayEnded(formatDateForApi(new Date()));
@@ -326,7 +346,7 @@ export default function WorkFromHomeScreen() {
                     </View>
                 ) : !isWorkStarted ? (
                     <TouchableOpacity
-                        style={[styles.button, styles.startButton]}
+                        style={[styles.button, { backgroundColor: theme.colors.primary }]}
                         disabled={loading}
                         onPress={handleStart}
                     >
@@ -352,7 +372,7 @@ export default function WorkFromHomeScreen() {
                         <TouchableOpacity
                             style={[styles.button, styles.endDayButton, styles.halfButton]}
                             disabled={loading}
-                            onPress={handleEndDay}
+                            onPress={() => { handleEndDayPress(); }}
                         >
                             {endDayMutation.isPending ? (
                                 <ActivityIndicator size="small" color="#fff" />
@@ -495,6 +515,40 @@ export default function WorkFromHomeScreen() {
                 </View>
             </ScrollView>
             <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
+
+
+            <Modal
+                visible={showConfirmModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowConfirmModal(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                        <Text style={[styles.modalTitle, { color: theme.colors.text }]}>End Work Day?</Text>
+                        <Text style={[styles.modalMessage, { color: theme.colors.textSecondary }]}>
+                            Are you sure you want to end your work day? You won't be able to log more hours for today.
+                        </Text>
+
+                        <View style={styles.modalButtonRow}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, { backgroundColor: theme.colors.surfaceVariant }]}
+                                onPress={() => setShowConfirmModal(false)}
+                            >
+                                <Text style={[styles.modalButtonText, { color: theme.colors.text }]}>Cancel</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.modalButton, { backgroundColor: '#ef4444' }]} // Destructive red action
+                                onPress={handleEndDay}
+                            >
+                                <Text style={[styles.modalButtonText, { color: '#ffffff' }]}>Yes, End Day</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
         </CorporateBackground>
     );
 }
@@ -563,4 +617,52 @@ const styles = StyleSheet.create({
 
     logRemarksRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 10, paddingTop: 10, borderTopWidth: 1, gap: 6 },
     logRemarksText: { fontSize: 13, flex: 1, lineHeight: 18 },
+
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent dark background
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalContent: {
+        width: '100%',
+        maxWidth: 400,
+        padding: 24,
+        borderRadius: 16,
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 10,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 12,
+    },
+    modalMessage: {
+        fontSize: 15,
+        lineHeight: 22,
+        marginBottom: 28,
+    },
+    modalButtonRow: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 12,
+    },
+    modalButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        minWidth: 100,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
+
 });

@@ -24,7 +24,7 @@ export interface ProfileInfo {
         bank_address?: string;
         account_holder_name?: string;
         account_number?: string;
-        ifsc?: string;
+        isfc?: string;
     };
 }
 

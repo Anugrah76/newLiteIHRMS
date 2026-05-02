@@ -344,7 +344,7 @@ export default function UnifiedCalendarScreen() {
     };
 
     const getTimesheetColor = (status: string): string => {
-        return status === 'submitted' ? '#10B981' : '#F59E0B';
+        return status === 'submitted' ? '#86e480ff' : '#F59E0B';
     };
 
     const getTimesheetLabel = (status: string): string => {
@@ -551,6 +551,18 @@ export default function UnifiedCalendarScreen() {
                                 <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Leave</Text>
                             </View>
                             <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#EC4899' }]} />
+                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Holiday</Text>
+                            </View>
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#F97316' }]} />
+                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Absent</Text>
+                            </View>
+                            <View style={styles.legendItem}>
+                                <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Mispunch</Text>
+                            </View>
+                            <View style={styles.legendItem}>
                                 <View style={[styles.legendDot, { backgroundColor: '#6B7280' }]} />
                                 <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Week Off</Text>
                             </View>
@@ -559,7 +571,7 @@ export default function UnifiedCalendarScreen() {
                     {viewFilter === 'all' || viewFilter === 'timesheet' ? (
                         <>
                             <View style={styles.legendItem}>
-                                <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
+                                <View style={[styles.legendDot, { backgroundColor: '#86e480ff' }]} />
                                 <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>TS Submitted</Text>
                             </View>
                             <View style={styles.legendItem}>
@@ -572,16 +584,9 @@ export default function UnifiedCalendarScreen() {
                         <>
                             <View style={styles.legendItem}>
                                 <View style={[styles.legendDot, { backgroundColor: '#8B5CF6' }]} />
-                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>On Leave</Text>
+                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Leave</Text>
                             </View>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendDot, { backgroundColor: '#10B981' }]} />
-                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Approved</Text>
-                            </View>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
-                                <Text style={[styles.legendText, { color: theme.colors.textSecondary }]}>Pending</Text>
-                            </View>
+
                         </>
                     ) : null}
                 </View>
