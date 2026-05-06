@@ -50,7 +50,7 @@ const getTravelTypeIcon = (typeName: string) => {
 
 const MyEventsScreen = () => {
     const router = useRouter();
-    const { user } = useAuthStore();
+    const user = useAuthStore((state) => state.user);
     const { setSidebarVisible } = useSidebarStore();
     const toast = useToast();
 
@@ -278,7 +278,7 @@ const MyEventsScreen = () => {
                 { text: "Cancel", style: "cancel" },
                 {
                     text: "OK",
-                    onPress: (remarks) => {
+                    onPress: (remarks: any) => {
                         cancelEventMutation.mutate({
                             event_id: event.id,
                             cancel_by: user?.emp_code || '',

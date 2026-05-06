@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
@@ -34,27 +34,37 @@ export default function DailyGoalsScreen() {
                 onMenuPress={() => setSidebarVisible(true)}
                 showBack={false}
             />
-            <SafeAreaView style={styles.container}>
-                <ScrollView
-                    style={styles.scrollContainer}
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View style={styles.content}>
-                        <DailyGoalsManager
-                            date={new Date()}
-                            kraList={tasks}
-                            onAddToKra={handleAddGoalToKra}
-                        />
-                    </View>
-                </ScrollView>
-            </SafeAreaView>
+            <KeyboardAvoidingView
+                style={styles.kavContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            >
+                <SafeAreaView style={styles.container}>
+                    <ScrollView
+                        style={styles.scrollContainer}
+                        contentContainerStyle={styles.scrollContent}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                    >
+                        <View style={styles.content}>
+                            <DailyGoalsManager
+                                date={new Date()}
+                                kraList={tasks}
+                                onAddToKra={handleAddGoalToKra}
+                            />
+                        </View>
+                    </ScrollView>
+                </SafeAreaView>
+            </KeyboardAvoidingView>
             <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
         </CorporateBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    kavContainer: {
+        flex: 1,
+    },
     container: {
         flex: 1,
     },

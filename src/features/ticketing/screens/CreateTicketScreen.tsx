@@ -7,7 +7,7 @@ import { CorporateGradient } from '@shared/components/ui/CorporateGradient';
 import { CorporateToast } from '@shared/components/ui/CorporateToast';
 import { useTicketHandlers, useCreateTicket } from '../hooks/useTicketing';
 import { TicketHandler } from '../types';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
 import { Picker } from '@react-native-picker/picker';
 import { TriangleAlert, EqualApproximately, ChevronsDown } from 'lucide-react-native';
 
@@ -100,10 +100,15 @@ export default function CreateTicketScreen() {
                 <TopBar title="Create Ticket" showBack />
 
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
                 >
-                    <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
                         <View style={styles.formCard}>
 
                             <View style={styles.fieldContainer}>
@@ -194,6 +199,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 16,
+        paddingBottom: 120,
     },
     formCard: {
         backgroundColor: '#FFFFFF',
@@ -207,6 +213,7 @@ const styles = StyleSheet.create({
     },
     fieldContainer: {
         marginBottom: 20,
+
     },
     label: {
         fontSize: 14,

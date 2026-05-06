@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         fontSize: 16,
-        color: '#FFFFFF',
+        color: '#000000 ',
         minHeight: 60,
         marginBottom: 16,
         textAlignVertical: 'top',

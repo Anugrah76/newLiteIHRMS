@@ -96,7 +96,7 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
         }
     };
 
-       const handleToggleComplete = async (goalId: string) => {
+    const handleToggleComplete = async (goalId: string) => {
         if (isSubmitted) return;
 
         const goal = goals.find(g => g.id === goalId);
@@ -280,6 +280,7 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
                             style={styles.goalsList}
                             contentContainerStyle={styles.goalsListContent}
                             showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="handled"
                         >
                             {goals.map(goal => (
                                 <View
@@ -379,10 +380,12 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
                                 value={inputText}
                                 onChangeText={setInputText}
                                 placeholder="Add a new goal..."
-                                placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                                multiline
+
+                                placeholderTextColor="rgb(0, 0, 0)"
                                 onSubmitEditing={handleAddGoal}
                                 returnKeyType="done"
-                                multiline={false}
+
                             />
                             <TouchableOpacity
                                 style={[
@@ -392,7 +395,7 @@ export const DailyGoalsManager: React.FC<DailyGoalsManagerProps> = ({
                                 onPress={handleAddGoal}
                                 disabled={!inputText.trim()}
                             >
-                                <Plus size={24} color="#FFFFFF" />
+                                <Plus size={24} color="#000000" />
                             </TouchableOpacity>
                         </View>
                     )}
@@ -578,12 +581,12 @@ const styles = StyleSheet.create({
     },
     goalText: {
         fontSize: 15,
-        color: '#FFFFFF',
+        color: '#000000',
         lineHeight: 20,
         fontWeight: '500',
     },
     goalTextCompleted: {
-        textDecorationLine: 'line-through',
+        // textDecorationLine: 'line-through',
         opacity: 0.6,
     },
     badges: {
@@ -645,8 +648,9 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         fontSize: 15,
-        color: '#FFFFFF',
+        color: '#000000',
         fontWeight: '500',
+        textAlignVertical: 'top',
     },
     addButton: {
         backgroundColor: 'rgba(255, 255, 255, 0.3)',

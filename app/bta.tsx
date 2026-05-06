@@ -15,7 +15,8 @@ import { useToast } from '@shared/components/Toast';
 import { useMyEvents, useTeamBtaList } from '@features/bta/hooks';
 import { PlaneTakeoff, Calendar, CheckCircle, XCircle, Plus } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
+
 
 export default function BtaScreen() {
     const theme = useTheme();
@@ -42,7 +43,7 @@ export default function BtaScreen() {
         from_date: '',
         to_date: '',
         indo_code: user?.indo_code || '',
-        
+
     }, !!user);
 
     // Safe access

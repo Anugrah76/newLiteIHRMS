@@ -28,7 +28,9 @@ const LEAVE_TYPE_MAP = LEAVE_TYPES.reduce((map, type) => {
     return map;
 }, {} as any);
 
-const STATUS_MAP = {
+type StatusKey = '0' | '1' | '2' | '3';
+
+const STATUS_MAP: Record<StatusKey, { name: string; color: string }> = {
     "0": { name: "Rejected", color: "#EF4444" },
     "1": { name: "Pending", color: "#F59E0B" },
     "2": { name: "Approved", color: "#10B981" },
@@ -103,7 +105,7 @@ export default function LeaveSummaryScreen() {
                 ...leave,
                 shortName: LEAVE_TYPE_MAP[leave.lt_id]?.short_name || leave.lt_id,
                 fullName: LEAVE_TYPE_MAP[leave.lt_id]?.name || leave.lt_id,
-                statusInfo: STATUS_MAP[leave.status] || { name: "Unknown", color: "#6B7280" }
+                statusInfo: STATUS_MAP[leave.status as StatusKey] || { name: "Unknown", color: "#6B7280" }
             }));
 
         const selectedMonthIdx = months.indexOf(selectedMonth);
@@ -150,7 +152,7 @@ export default function LeaveSummaryScreen() {
     };
 
     const getStatusIcon = (status: string) => {
-        const statusInfo = STATUS_MAP[status];
+        const statusInfo = STATUS_MAP[status as StatusKey];
         if (status === '2') return CheckCircle;
         if (status === '0' || status === '3') return XCircle;
         return Clock;

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
 import * as ticketingApi from '../api/ticketingApi';
 import { CreateTicketPayload, MyTicketsPayload } from '../types';
 

@@ -6,14 +6,15 @@ import { TopBar } from '@shared/components/ui/TopBar';
 import { MapPin, Calendar, Clock, Save } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
 import { useEventTravel, useSaveTravel } from '@features/bta/hooks';
 import { CorporateToast } from '@shared/components/ui/CorporateToast';
 
 const TravelBookingScreen = () => {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const { user } = useAuthStore();
+    const user = useAuthStore((state) => state.user);
+
 
     // Params
     const eventId = params.eventId as string;

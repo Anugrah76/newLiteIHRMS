@@ -34,6 +34,7 @@ export default function DashboardScreen() {
     const router = useRouter();
     const theme = useTheme();
     const user = useAuthStore((state) => state.user);
+    console.log('[DASHBOARD] MOUNTED', { hasUser: !!user, userName: user?.fullName || 'null', indo_code: user?.indo_code || 'null' });
     const companyConfig = useConfigStore((state) => state.companyConfig);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [sidebarVisible, setSidebarVisible] = useState(false);

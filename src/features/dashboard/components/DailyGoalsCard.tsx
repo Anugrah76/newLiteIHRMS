@@ -273,6 +273,7 @@ export const DailyGoalsCard: React.FC<DailyGoalsCardProps> = ({
                             placeholderTextColor="rgba(0, 0, 0, 0.6)"
                             onSubmitEditing={handleAddGoal}
                             returnKeyType="done"
+                            multiline
                         />
                         <TouchableOpacity
                             style={[
@@ -449,7 +450,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#1A202C',
+        textAlignVertical: 'top',
     },
     addButton: {
         backgroundColor: 'rgba(255, 255, 255, 0.3)',

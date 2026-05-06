@@ -7,7 +7,7 @@ import { CorporateGradient } from '@shared/components/ui/CorporateGradient';
 import { ChatMessage } from '../components/ChatMessage';
 import { useTicketChat } from '../hooks/useTicketing';
 import { TicketReply } from '../types';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
 import { MessageCircle } from 'lucide-react-native';
 
 export default function TicketChatScreen() {

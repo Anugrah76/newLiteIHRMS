@@ -29,7 +29,7 @@ export default function ProfileScreen() {
     const handleLogout = async () => {
         await removeToken();
         logout();
-        router.replace('/(auth)/submit');
+        router.replace('/(auth)/login');
     };
 
     return (

@@ -58,7 +58,7 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
  * Hook for user login
  */
 export const useLogin = () => {
-    const setUser = useAuthStore((state) => state.setUser);
+    const setAuth = useAuthStore((state) => state.setAuth);
 
     return useMutation({
         mutationFn: login,
@@ -80,7 +80,7 @@ export const useLogin = () => {
                 };
 
                 // Save to Zustand store
-                setUser(user);
+                setAuth(user, user.api_key);
 
                 // Also save to SecureStore for persistence
                 await saveToken(user);

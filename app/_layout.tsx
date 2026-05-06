@@ -7,6 +7,7 @@ import { ToastProvider } from '@shared/components/Toast';
 import { NotificationService } from '@shared/utils/NotificationService';
 
 export default function RootLayout() {
+    console.log('[ROOT_LAYOUT] RootLayout MOUNTED');
     useEffect(() => {
         const initNotifications = async () => {
             await NotificationService.registerForPushNotificationsAsync();

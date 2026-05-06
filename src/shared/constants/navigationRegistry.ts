@@ -57,7 +57,7 @@ export const NAVIGATION_REGISTRY: NavigationItem[] = [
         id: 'timesheet',
         title: 'Time Sheet',
         subtitle: 'Weekly timesheet view',
-        route: '/(tabs)/timesheet',
+        route: '/timesheet',
         icon: ListTodo,
         keywords: ['work', 'log', 'hours'],
         category: 'Attendance'

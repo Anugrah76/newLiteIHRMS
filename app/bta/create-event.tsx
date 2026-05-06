@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Save } from 'lucide-react-native';
 import { TopBar } from '@shared/components/ui/TopBar';
-import { useAuthStore } from '@features/auth/store/authSlice';
+import { useAuthStore } from '@shared/store';
 import { useCreateEvent, useUpdateEvent, useTravelModes, useTravelTypes, useMyEvents } from '@features/bta/hooks';
 import { CorporateToast } from '@shared/components/ui/CorporateToast';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 const CreateEventScreen = () => {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const { user } = useAuthStore();
+    const user = useAuthStore((state) => state.user);
 
     const isEdit = !!params.eventId;
     const eventId = params.eventId as string;

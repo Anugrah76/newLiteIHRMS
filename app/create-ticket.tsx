@@ -7,6 +7,9 @@ import {
     TouchableOpacity,
     TextInput,
     ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform
+
 } from 'react-native';
 import { CorporateBackground } from '@shared/components/CorporateBackground';
 import { TopBar } from '@shared/components/ui/TopBar';
@@ -121,115 +124,125 @@ export default function CreateTicketScreen() {
                 onNotificationPress={() => toast.show('info', 'Notifications', 'Coming soon')}
             />
 
-            <ScrollView
-                style={styles.scrollContainer}
-                contentContainerStyle={styles.scrollContent}
+
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} // Adjust this number if it's too high/low on iOS
             >
-                {/* Person Selection */}
-                <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                    {loadingHandlers ? (
-                        <ActivityIndicator size="small" color={theme.colors.primary} />
-                    ) : (
-                        <SelectField
-                            label="Select Person *"
-                            placeholder="Select a person"
-                            value={selectedPersonId}
-                            onValueChange={setSelectedPersonId}
-                            options={personOptions}
-                        />
-                    )}
-                </View>
 
-                {/* Priority Selection */}
-                <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                    <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
-                        Priority *
-                    </Text>
-                    <View style={styles.priorityRow}>
-                        {priorities.map((p) => (
-                            <TouchableOpacity
-                                key={p.id}
-                                style={[
-                                    styles.priorityButton,
-                                    {
-                                        backgroundColor: priority === p.id ? p.color : theme.colors.surfaceVariant,
-                                        borderColor: p.color,
-                                    },
-                                ]}
-                                onPress={() => setPriority(p.id)}
-                            >
-                                <Text
-                                    style={[
-                                        styles.priorityText,
-                                        { color: priority === p.id ? '#ffffff' : theme.colors.text },
-                                    ]}
-                                >
-                                    {p.label}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
 
-                {/* Subject */}
-                <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                    <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
-                        Subject *
-                    </Text>
-                    <TextInput
-                        style={[styles.input, {
-                            backgroundColor: theme.colors.surface,
-                            borderColor: theme.colors.border,
-                            color: theme.colors.text
-                        }]}
-                        value={subject}
-                        onChangeText={setSubject}
-                        placeholder="Brief description of the issue"
-                        placeholderTextColor={theme.colors.textTertiary}
-                    />
-                </View>
-
-                {/* Description */}
-                <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
-                    <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
-                        Description *
-                    </Text>
-                    <TextInput
-                        style={[styles.textArea, {
-                            backgroundColor: theme.colors.surface,
-                            borderColor: theme.colors.border,
-                            color: theme.colors.text
-                        }]}
-                        value={description}
-                        onChangeText={setDescription}
-                        placeholder="Detailed description of the issue..."
-                        placeholderTextColor={theme.colors.textTertiary}
-                        multiline
-                        numberOfLines={6}
-                        textAlignVertical="top"
-                    />
-                </View>
-
-                {/* Submit Button */}
-                <TouchableOpacity
-                    style={[
-                        styles.submitButton,
-                        { backgroundColor: theme.colors.primary },
-                        isPending && styles.submitButtonDisabled,
-                    ]}
-                    onPress={handleSubmit}
-                    disabled={isPending}
+                <ScrollView
+                    style={styles.scrollContainer}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={styles.scrollContent}
                 >
-                    {isPending ? (
-                        <ActivityIndicator size="small" color="#ffffff" />
-                    ) : (
-                        <>
-                            <MessageSquare width={20} height={20} color="#ffffff" />
-                            <Text style={styles.submitButtonText}>Create Ticket</Text>
-                        </>
-                    )}
-                </TouchableOpacity>
-            </ScrollView>
+                    {/* Person Selection */}
+                    <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                        {loadingHandlers ? (
+                            <ActivityIndicator size="small" color={theme.colors.primary} />
+                        ) : (
+                            <SelectField
+                                label="Select Person *"
+                                placeholder="Select a person"
+                                value={selectedPersonId}
+                                onValueChange={setSelectedPersonId}
+                                options={personOptions}
+                            />
+                        )}
+                    </View>
+
+                    {/* Priority Selection */}
+                    <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+                            Priority *
+                        </Text>
+                        <View style={styles.priorityRow}>
+                            {priorities.map((p) => (
+                                <TouchableOpacity
+                                    key={p.id}
+                                    style={[
+                                        styles.priorityButton,
+                                        {
+                                            backgroundColor: priority === p.id ? p.color : theme.colors.surfaceVariant,
+                                            borderColor: p.color,
+                                        },
+                                    ]}
+                                    onPress={() => setPriority(p.id)}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.priorityText,
+                                            { color: priority === p.id ? '#ffffff' : theme.colors.text },
+                                        ]}
+                                    >
+                                        {p.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+
+                    {/* Subject */}
+                    <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+                            Subject *
+                        </Text>
+                        <TextInput
+                            style={[styles.input, {
+                                backgroundColor: theme.colors.surface,
+                                borderColor: theme.colors.border,
+                                color: theme.colors.text
+                            }]}
+                            value={subject}
+                            onChangeText={setSubject}
+                            placeholder="Brief description of the issue"
+                            placeholderTextColor={theme.colors.textTertiary}
+                        />
+                    </View>
+
+                    {/* Description */}
+                    <View style={[styles.card, { backgroundColor: theme.colors.cardPrimary, borderColor: theme.colors.border }]}>
+                        <Text style={[styles.label, { color: theme.colors.textSecondary }]}>
+                            Description *
+                        </Text>
+                        <TextInput
+                            style={[styles.textArea, {
+                                backgroundColor: theme.colors.surface,
+                                borderColor: theme.colors.border,
+                                color: theme.colors.text
+                            }]}
+                            value={description}
+                            onChangeText={setDescription}
+                            placeholder="Detailed description of the issue..."
+                            placeholderTextColor={theme.colors.textTertiary}
+                            multiline
+                            numberOfLines={6}
+                            textAlignVertical="top"
+                        />
+                    </View>
+
+                    {/* Submit Button */}
+                    <TouchableOpacity
+                        style={[
+                            styles.submitButton,
+                            { backgroundColor: theme.colors.primary },
+                            isPending && styles.submitButtonDisabled,
+                        ]}
+                        onPress={handleSubmit}
+                        disabled={isPending}
+                    >
+                        {isPending ? (
+                            <ActivityIndicator size="small" color="#ffffff" />
+                        ) : (
+                            <>
+                                <MessageSquare width={20} height={20} color="#ffffff" />
+                                <Text style={styles.submitButtonText}>Create Ticket</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                </ScrollView>
+            </KeyboardAvoidingView>
 
             <Sidebar visible={sidebarVisible} onClose={() => setSidebarVisible(false)} />
         </CorporateBackground>
@@ -255,6 +268,7 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 2,
     },
+
     label: {
         fontSize: 14,
         fontWeight: '600',
@@ -285,6 +299,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 2,
         alignItems: 'center',
+
     },
     priorityText: {
         fontSize: 14,

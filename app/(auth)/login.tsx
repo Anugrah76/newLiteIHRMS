@@ -42,7 +42,7 @@ export default function LoginScreen() {
 
     useEffect(() => {
         const backAction = () => {
-            router.back();
+            router.replace('/(auth)/submit');
             return true;
         };
 
@@ -112,7 +112,7 @@ export default function LoginScreen() {
             {/* Back Button */}
             <Pressable
                 style={styles.backButton}
-                onPress={() => router.back()}
+                onPress={() => router.replace('/(auth)/submit')}
             >
                 <View style={[styles.backButtonCircle, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
                     <ArrowLeft width={24} height={24} color="#ffffff" />

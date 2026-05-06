@@ -11,7 +11,7 @@ export const getDeviceId = async (username: string): Promise<string> => {
         const deviceModel = Device.modelName || 'Unknown';
         const uuid = await Crypto.digestStringAsync(
             Crypto.CryptoDigestAlgorithm.SHA256,
-            `${username}-${deviceModel}-${Date.now()}`
+            `${username}-${deviceModel}`
         );
 
         return `${deviceModel}-${uuid.substring(0, 16)}`;
@@ -25,5 +25,6 @@ export const getDeviceId = async (username: string): Promise<string> => {
  * Get device manufacturer
  */
 export const getDeviceManufacturer = (): string => {
+    console.log(Device.manufacturer);
     return Device.manufacturer || 'Unknown';
 };
